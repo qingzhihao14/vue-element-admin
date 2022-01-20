@@ -1,4 +1,5 @@
-import { login, logout, getInfo } from '@/api/user'
+import { login, getInfo } from '@/api/user'
+// import { login, logout, getInfo } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
 
@@ -35,9 +36,14 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password }).then(response => {
         const { data } = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
-        resolve()
+        if (data) {
+          commit('SET_TOKEN', data.token)
+          setToken(data.token)
+          resolve()
+        } else {
+          console.log(response.message)
+          // this.$message.error()
+        }
       }).catch(error => {
         reject(error)
       })
@@ -49,13 +55,16 @@ const actions = {
     return new Promise((resolve, reject) => {
       getInfo(state.token).then(response => {
         const { data } = response
-
+        debugger
         if (!data) {
+          data.roles = [1, 2]
+          data.name = '测试'
+          data.avatar = '123'
+          data.roles = '测试介绍'
           reject('Verification failed, please Login again.')
         }
 
         const { roles, name, avatar, introduction } = data
-
         // roles must be a non-empty array
         if (!roles || roles.length <= 0) {
           reject('getInfo: roles must be a non-null array!')
@@ -74,22 +83,31 @@ const actions = {
 
   // user logout
   logout({ commit, state, dispatch }) {
-    return new Promise((resolve, reject) => {
-      logout(state.token).then(() => {
-        commit('SET_TOKEN', '')
-        commit('SET_ROLES', [])
-        removeToken()
-        resetRouter()
+    commit('SET_TOKEN', '')
+    commit('SET_ROLES', [])
+    removeToken()
+    resetRouter()
+    // reset visited views and cached views
+    // to fixed https://github.com/PanJiaChen/vue-element-admin/issues/2485
+    dispatch('tagsView/delAllViews', null, { root: true })
 
-        // reset visited views and cached views
-        // to fixed https://github.com/PanJiaChen/vue-element-admin/issues/2485
-        dispatch('tagsView/delAllViews', null, { root: true })
+    // return new Promise((resolve, reject) => {
+    //   logout(state.token).then(() => {
+    //     debugger
+    //     commit('SET_TOKEN', '')
+    //     commit('SET_ROLES', [])
+    //     removeToken()
+    //     resetRouter()
 
-        resolve()
-      }).catch(error => {
-        reject(error)
-      })
-    })
+    //     // reset visited views and cached views
+    //     // to fixed https://github.com/PanJiaChen/vue-element-admin/issues/2485
+    //     dispatch('tagsView/delAllViews', null, { root: true })
+
+    //     resolve()
+    //   }).catch(error => {
+    //     reject(error)
+    //   })
+    // })
   },
 
   // remove token
