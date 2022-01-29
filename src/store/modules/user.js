@@ -39,9 +39,9 @@ const actions = {
         if (data) {
           commit('SET_TOKEN', data.token)
           setToken(data.token)
-          resolve()
+          resolve(response)
         } else {
-          console.log(response.message)
+          resolve(response)
           // this.$message.error()
         }
       }).catch(error => {
@@ -55,7 +55,6 @@ const actions = {
     return new Promise((resolve, reject) => {
       getInfo(state.token).then(response => {
         const { data } = response
-        debugger
         if (!data) {
           data.roles = [1, 2]
           data.name = '测试'
