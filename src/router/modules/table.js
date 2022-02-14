@@ -9,20 +9,20 @@ const tableRouter = {
   name: 'Table',
   meta: {
     title: 'Table',
-    icon: 'table'
+    icon: 'wechat'
   },
   children: [
     {
       path: 'dynamic-table',
       component: () => import('@/views/table/dynamic-table/index'),
       name: 'DynamicTable',
-      meta: { title: 'Dynamic Table' }
+      meta: { title: '类别项维护' }
     },
     {
       path: 'drag-table',
       component: () => import('@/views/table/drag-table'),
       name: 'DragTable',
-      meta: { title: 'Drag Table' }
+      meta: { title: '订单信息' }
     },
     {
       path: 'inline-edit-table',

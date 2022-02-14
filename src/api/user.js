@@ -22,3 +22,9 @@ export function logout() {
     method: 'post'
   })
 }
+export function getLbXms() {
+  return request({
+    url: '/getLbXms',
+    method: 'get'
+  })
+}

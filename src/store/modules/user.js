@@ -55,7 +55,7 @@ const actions = {
     return new Promise((resolve, reject) => {
       getInfo(state.token).then(response => {
         const { data } = response
-        debugger
+        // debugger
         if (!data) {
           data.roles = [1, 2]
           data.name = '测试'
