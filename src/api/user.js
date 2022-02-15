@@ -28,3 +28,17 @@ export function getLbXms() {
     method: 'get'
   })
 }
+export function insertOrUpdateLbItem(data) {
+  return request({
+    url: '/insertOrUpdateLbItem',
+    method: 'post',
+    data
+  })
+}
+export function insertOrUpdateLb(data) {
+  return request({
+    url: '/insertOrUpdateLb',
+    method: 'post',
+    data
+  })
+}

@@ -268,7 +268,7 @@
 <script>
 // import { fetchList } from '@/api/article'
 // @import url("//unpkg.com/element-ui@2.15.7/lib/theme-chalk/index.css");
-import { getLbXms } from '@/api/user'
+import { getLbXms, insertOrUpdateLbItem, insertOrUpdateLb } from '@/api/user'
 export default {
   name: 'InlineEditTable',
   data() {
@@ -303,34 +303,35 @@ export default {
         //   { min: 6, message: '密码不能少于6位' }
         // ]
       },
-      tableData: [{
-        id: 3,
-        code: 'A',
-        name: '王小虎1',
-        lbItem: [{
-          id: 31,
-          code: 'AA',
-          name: '王小虎2',
-          price: 158,
-          unit: '次',
-          sold: 0,
-          fwqx: '',
-          fwxz: '',
-          fwxj: '',
-          fwbz: ''
-        }, {
-          id: 32,
-          code: 'AA',
-          name: '张三',
-          price: 158,
-          unit: '次',
-          sold: 0,
-          fwqx: '',
-          fwxz: '',
-          fwxj: '',
-          fwbz: ''
-        }]
-      }],
+      tableData: [{}],
+      // tableData: [{
+      //   id: 3,
+      //   code: 'A',
+      //   name: '王小虎1',
+      //   lbItem: [{
+      //     id: 31,
+      //     code: 'AA',
+      //     name: '王小虎2',
+      //     price: 158,
+      //     unit: '次',
+      //     sold: 0,
+      //     fwqx: '',
+      //     fwxz: '',
+      //     fwxj: '',
+      //     fwbz: ''
+      //   }, {
+      //     id: 32,
+      //     code: 'AA',
+      //     name: '张三',
+      //     price: 158,
+      //     unit: '次',
+      //     sold: 0,
+      //     fwqx: '',
+      //     fwxz: '',
+      //     fwxj: '',
+      //     fwbz: ''
+      //   }]
+      // }],
       search: '',
       dialogFormVisibleLbXm: false,
       editName: '',
@@ -381,15 +382,20 @@ export default {
       console.log(index, row)
     },
     reset() {
-      this.formData.psd = ''
-      this.formData.psdC = ''
+      // this.formData.psd = ''
+      // this.formData.psdC = ''
     },
-    async summit() {
+    summit() {
       var that = this
+      console.log('保存类别', that.formData)
       if (that.formData.LB) {
         that.$refs['formLb']
           .validate()
           .then(async() => {
+            that.formData.lbItem = ''
+            console.log('保存类别', that.formData)
+            const { data } = await insertOrUpdateLb(that.formData)
+            console.log(data)
             // var param = {}
             // param = {
             //   yhgl: that.formData.LB, // 用户管理
@@ -413,6 +419,9 @@ export default {
         that.$refs['formXm']
           .validate()
           .then(async() => {
+            console.log('保存项目', that.formData)
+            const { data } = await insertOrUpdateLbItem(that.formData)
+            console.log(data)
             // var param = {}
             // param = {
             //   yhgl: that.formData.LB, // 修改密码（个人）
@@ -430,7 +439,6 @@ export default {
           })
       }
       that.dialogFormVisibleLbXm = false
-      that.formData = {}
     }
   }
 }
