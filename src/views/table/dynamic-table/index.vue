@@ -1,8 +1,8 @@
 <template>
   <div class="app-container">
     <el-row :gutter="20">
-      <el-col :span="6"><div class="grid-content bg-purple" /></el-col>
-      <el-col :span="12">
+      <el-col :span="8"><div class="grid-content bg-purple" /></el-col>
+      <el-col :span="8">
         <div class="grid-content bg-purplez">
           <el-table
             :data="tableData"
@@ -21,9 +21,31 @@
             <el-table-column
               prop="name"
               label="类别/名称"
-              width="180"
-            />
-            <el-table-column label="操作">
+              min-width="180"
+              header-align="center"
+            >
+              <template slot="header">
+                类别
+                <el-button
+                  size="mini"
+                  type="primary"
+                  circle
+                  @click="addLb()"
+                >添加</el-button>
+                / 项目
+                <el-button
+                  size="mini"
+                  type="primary"
+                  circle
+                  @click="addXm()"
+                >添加</el-button>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="操作"
+              header-align="center"
+              align="center"
+            >
               <!-- <template slot="header" slot-scope="scope">
                 搜索：
                 <input
@@ -33,7 +55,9 @@
                   @keyup.enter="searchz(search)"
                 >
               </template> -->
-              <template slot-scope="scope">
+              <template
+                slot-scope="scope"
+              >
                 <el-button
                   size="mini"
                   @click="handleEdit(scope.$index, scope.row)"
@@ -48,10 +72,10 @@
           </el-table>
         </div>
       </el-col>
-      <el-col :span="6"><div class="grid-content bg-purple" /></el-col>
+      <el-col :span="8"><div class="grid-content bg-purple" /></el-col>
     </el-row>
     <!-- 编辑类别、项目 -->
-    <el-dialog :title="editName" :visible.sync="dialogFormVisibleLbXm">
+    <el-dialog :title="editName" :visible.sync="dialogFormVisibleLbXm" @close="closeWin">
       <el-container>
         <el-main>
           <vxe-form
@@ -335,7 +359,9 @@ export default {
       search: '',
       dialogFormVisibleLbXm: false,
       editName: '',
-      refform: ''
+      refform: '',
+      rowCopyLb: {},
+      rowCopyXm: {}
     }
   },
   created() {
@@ -369,21 +395,28 @@ export default {
         this.refform = 'formLb'
         this.editName = '类别'
         row.LB = true
-        this.formData = row
+        this.rowCopyLb = JSON.parse(JSON.stringify(row))
+        const rowLb = JSON.parse(JSON.stringify(row))
+        this.formData = rowLb
       } else {
         // 项目
         this.refform = 'formXm'
         this.editName = '项目'
         row.LB = false
-        this.formData = row
+        this.rowCopyXm = JSON.parse(JSON.stringify(row))
+        const rowXm = JSON.parse(JSON.stringify(row))
+        this.formData = rowXm
       }
     },
     handleDelete(index, row) {
       console.log(index, row)
     },
     reset() {
-      // this.formData.psd = ''
-      // this.formData.psdC = ''
+      if (this.formData.lbItem) {
+        this.formData = JSON.parse(JSON.stringify(this.rowCopyLb))
+      } else {
+        this.formData = JSON.parse(JSON.stringify(this.rowCopyXm))
+      }
     },
     summit() {
       var that = this
@@ -392,53 +425,46 @@ export default {
         that.$refs['formLb']
           .validate()
           .then(async() => {
-            that.formData.lbItem = ''
-            console.log('保存类别', that.formData)
-            const { data } = await insertOrUpdateLb(that.formData)
-            console.log(data)
-            // var param = {}
-            // param = {
-            //   yhgl: that.formData.LB, // 用户管理
-            //   action: that.formData.action, // edit
-            //   uname: that.formData.UNAME,
-            //   username: that.formData.UPCODE,
-            //   // psdo: that.formData.psdO,
-            //   psd: that.formData.psd,
-            //   mobile: that.formData.MOBILE
-            // }
-            // var res = await changePsd(param)
-            // that.$emit('fetch-data')
-            // that.$emit('changeDialog', false)
-            // if (res.data === true) {
-            //   this.$message.success(res.msg)
-            // } else {
-            //   this.$message.warning(res.msg)
-            // }
+            const params = that.formData
+            params.lbItem = ''
+            console.log('保存类别', params)
+            const result = await insertOrUpdateLb(params)
+            if (result && result.code === 0) {
+              that.$message.success('保存成功')
+              that.refresh()
+              console.log(result)
+            } else {
+              that.$message.success('保存失败')
+            }
           })
       } else {
         that.$refs['formXm']
           .validate()
           .then(async() => {
             console.log('保存项目', that.formData)
-            const { data } = await insertOrUpdateLbItem(that.formData)
-            console.log(data)
-            // var param = {}
-            // param = {
-            //   yhgl: that.formData.LB, // 修改密码（个人）
-            //   username: that.username,
-            //   psd: that.formData.psd
-            // }
-            // var res = await changePsd(param)
-            // that.$emit('fetch-data')
-            // that.$emit('changeDialog', false)
-            // if (res.data === true) {
-            //   this.$message.success(res.msg)
-            // } else {
-            //   this.$message.warning(res.msg)
-            // }
+            const result = await insertOrUpdateLbItem(that.formData)
+            if (result && result.code === 0) {
+              that.$message.success('保存成功')
+              that.refresh()
+              console.log(result)
+            } else {
+              that.$message.success('保存失败')
+            }
           })
       }
       that.dialogFormVisibleLbXm = false
+    },
+    refresh() {
+      this.getLbXms()
+    },
+    closeWin() {
+      this.dialogFormVisibleLbXm = false
+    },
+    addLb() {
+
+    },
+    addXm() {
+
     }
   }
 }
