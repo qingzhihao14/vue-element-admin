@@ -279,6 +279,29 @@
               </template>
             </vxe-form-item>
           </vxe-form> -->
+            <vxe-form-item
+              v-if="!formData.LB"
+              title="示例图片"
+              field="MOBILE"
+              span="24"
+              :item-render="{}"
+              title-overflow="title"
+            >
+              <!-- <template #default="params"> -->
+              <template #default>
+                <el-upload
+                  ref="upload"
+                  class="avatar-uploader"
+                  :show-file-list="false"
+                  :on-success="handleAvatarSuccess"
+                  :before-upload="beforeAvatarUpload"
+                  :on-progress="onProgress"
+                >
+                  <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                  <i v-else class="el-icon-plus avatar-uploader-icon" />
+                </el-upload>
+              </template>
+            </vxe-form-item>
           </vxe-form></el-main>
         <el-footer style="text-align: center">
           <el-button @click="reset">重置</el-button>
@@ -292,7 +315,7 @@
 <script>
 // import { fetchList } from '@/api/article'
 // @import url("//unpkg.com/element-ui@2.15.7/lib/theme-chalk/index.css");
-import { getLbXms, insertOrUpdateLbItem, insertOrUpdateLb } from '@/api/user'
+import { getLbXms, insertOrUpdateLbItem, insertOrUpdateLb, insertOrUpdateLbItemPic } from '@/api/user'
 export default {
   name: 'InlineEditTable',
   data() {
@@ -361,7 +384,9 @@ export default {
       editName: '',
       refform: '',
       rowCopyLb: {},
-      rowCopyXm: {}
+      rowCopyXm: {},
+      imageUrl: '',
+      fileList: ''
     }
   },
   created() {
@@ -465,6 +490,34 @@ export default {
     },
     addXm() {
 
+    },
+    handleAvatarSuccess(res, file) {
+      debugger
+      this.imageUrl = URL.createObjectURL(file.raw)
+    },
+    async onProgress(event, file, fileList) {
+      debugger
+      const result = await insertOrUpdateLbItemPic(this.formData.id, file)
+      debugger
+      if (result.code === 0) {
+        this.imageUrl = result.data
+        this.$message.warning('上传成功')
+      } else {
+        this.$message.warning('上传失败')
+      }
+    },
+    beforeAvatarUpload(file) {
+      const isJPG = file.type === 'image/jpeg'
+      // const isLt2M = file.size / 1024 / 1024 < 2
+
+      if (!isJPG) {
+        this.$message.error('上传头像图片只能是 JPG 格式!')
+      }
+      // if (!isLt2M) {
+      //   this.$message.error('上传头像图片大小不能超过 2MB!')
+      // }
+      // return isJPG && isLt2M
+      return isJPG
     }
   }
 }
@@ -496,5 +549,29 @@ export default {
   .row-bg {
     padding: 10px 0;
     background-color: #f9fafc;
+  }
+
+  .avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar-uploader .el-upload:hover {
+    border-color: #409EFF;
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+  }
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
   }
 </style>
