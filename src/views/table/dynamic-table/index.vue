@@ -74,45 +74,17 @@
       </el-col>
       <el-col :span="8"><div class="grid-content bg-purple" /></el-col>
     </el-row>
-    <!-- 编辑类别、项目 -->
-    <el-dialog :title="editName" :visible.sync="dialogFormVisibleLbXm" @close="closeWin">
+    <!-- 编辑添加类别 -->
+    <el-dialog :title="newTitle" :visible.sync="newDialogFormVisible" @close="newCoseWin">
       <el-container>
         <el-main>
           <vxe-form
-            :ref="refform"
+            ref="newRefform"
             title-width="90px"
             size="mini"
-            :data="formData"
-            :rules="formRules"
+            :data="newFormData"
             title-align="right"
           >
-            <!-- v-if="!formData.LB && flag === 'addXm'" -->
-            <vxe-form-item
-              v-if="editName === '项目-新增'"
-              title="类别"
-              field="sex"
-              span="24"
-              :item-render="{}"
-              title-overflow
-            >
-              <template #default="params">
-                <el-select
-                  v-model="params.data.parent"
-                  v-bind="params.data.parent"
-                  placeholder="请选择"
-                  style="width: 100%"
-                  v-on="params.data.parent"
-                  @change="selectChange"
-                >
-                  <el-option
-                    v-for="item in lbDic"
-                    :key="item.code"
-                    :label="item.name"
-                    :value="item.code"
-                  />
-                </el-select>
-              </template>
-            </vxe-form-item>
             <vxe-form-item
               v-if="false"
               title="编码"
@@ -130,8 +102,82 @@
               </template>
             </vxe-form-item>
             <vxe-form-item
-              v-if="true"
-              title="类名"
+              title="名称"
+              field="name"
+              span="24"
+              :item-render="{}"
+              title-overflow="title"
+            >
+              <template #default="params">
+                <vxe-input
+                  v-model="params.data.name"
+                  placeholder="请输入类名"
+                  clearable
+                />
+              </template>
+            </vxe-form-item>
+          </vxe-form></el-main>
+        <el-footer style="text-align: center">
+          <!-- <el-button @click="reset">重置</el-button> -->
+          <el-button type="primary" @click="newSummit">保存</el-button>
+        </el-footer>
+      </el-container>
+    </el-dialog>
+    <!-- 编辑、添加项目 -->
+    <el-dialog :title="editName" :visible.sync="dialogFormVisibleLbXm" @close="closeWin">
+      <el-container>
+        <el-main>
+          <vxe-form
+            :ref="refform"
+            title-width="90px"
+            size="mini"
+            :data="formData"
+            :rules="formRules"
+            title-align="right"
+          >
+            <vxe-form-item
+              v-if="false"
+              title="编码"
+              field="code"
+              span="24"
+              :item-render="{}"
+              title-overflow="title"
+            >
+              <template #default="params">
+                <vxe-input
+                  v-model="params.data.code"
+                  placeholder="请输入编码"
+                  clearable
+                />
+              </template>
+            </vxe-form-item>
+            <!-- v-if="!formData.LB && flag === 'addXm'" -->
+            <!--
+              v-if="formData.LB && flag === 'addXm'" -->
+            <vxe-form-item
+              title="类别"
+              field="parent"
+              span="24"
+              :item-render="{}"
+              title-overflow
+            >
+              <template #default="params">
+                <el-select
+                  v-model="params.data.parent"
+                  placeholder="请选择"
+                  style="width: 100%"
+                >
+                  <el-option
+                    v-for="item in lbDic"
+                    :key="item.code"
+                    :label="item.name"
+                    :value="item.code"
+                  />
+                </el-select>
+              </template>
+            </vxe-form-item>
+            <vxe-form-item
+              title="名称"
               field="name"
               span="24"
               :item-render="{}"
@@ -146,7 +192,6 @@
               </template>
             </vxe-form-item>
             <vxe-form-item
-              v-if="!formData.LB"
               title="价格"
               field="price"
               span="24"
@@ -162,7 +207,6 @@
               </template>
             </vxe-form-item>
             <vxe-form-item
-              v-if="!formData.LB"
               title="单位"
               field="unit"
               span="24"
@@ -178,7 +222,6 @@
               </template>
             </vxe-form-item>
             <vxe-form-item
-              v-if="!formData.LB"
               title="服务期限"
               field="fwqx"
               span="24"
@@ -194,7 +237,6 @@
               </template>
             </vxe-form-item>
             <vxe-form-item
-              v-if="!formData.LB"
               title="服务限制"
               field="fwxz"
               span="24"
@@ -210,7 +252,6 @@
               </template>
             </vxe-form-item>
             <vxe-form-item
-              v-if="!formData.LB"
               title="服务细节"
               field="fwxj"
               span="24"
@@ -226,7 +267,6 @@
               </template>
             </vxe-form-item>
             <vxe-form-item
-              v-if="!formData.LB"
               title="服务保证"
               field="fwbz"
               span="24"
@@ -241,57 +281,7 @@
                 />
               </template>
             </vxe-form-item>
-            <!-- <vxe-form-item
-              title="新密码"
-              field="psd"
-              span="24"
-              :item-render="{}"
-              title-overflow="title"
-            >
-              <template #default="params">
-                <vxe-input
-                  v-model="params.data.psd"
-                  placeholder="请输入密码"
-                  clearable
-                  type="password"
-                />
-              </template>
-            </vxe-form-item>
             <vxe-form-item
-              title="确认密码"
-              field="psdC"
-              span="24"
-              :item-render="{}"
-              title-overflow="title"
-            >
-              <template #default="params">
-                <vxe-input
-                  v-model="params.data.psdC"
-                  placeholder="请输入密码"
-                  clearable
-                  type="password"
-                />
-              </template>
-            </vxe-form-item>
-            <vxe-form-item
-              v-if="formData.LB"
-              title="电话"
-              field="MOBILE"
-              span="24"
-              :item-render="{}"
-              title-overflow="title"
-            >
-              <template #default="params">
-                <vxe-input
-                  v-model="params.data.MOBILE"
-                  placeholder="请输入电话"
-                  clearable
-                />
-              </template>
-            </vxe-form-item>
-          </vxe-form> -->
-            <vxe-form-item
-              v-if="!formData.LB"
               title="示例图片"
               field="MOBILE"
               span="24"
@@ -316,7 +306,6 @@
             </vxe-form-item>
           </vxe-form></el-main>
         <el-footer style="text-align: center">
-          <el-button @click="reset">重置</el-button>
           <el-button type="primary" @click="summit">保存</el-button>
         </el-footer>
       </el-container>
@@ -325,73 +314,16 @@
 </template>
 
 <script>
-// import { fetchList } from '@/api/article'
-// @import url("//unpkg.com/element-ui@2.15.7/lib/theme-chalk/index.css");
-import { getLb, getLbXms, insertOrUpdateLbItem, insertOrUpdateLb, insertOrUpdateLbItemPic } from '@/api/user'
+import { getLb, getLbXms, insertOrUpdateLbItem, insertOrUpdateLb, insertOrUpdateLbItemPic, delLb, delXm } from '@/api/user'
 import { baseURL } from '/src/settings.js'
 export default {
   name: 'InlineEditTable',
   data() {
-    // const validatePassword = (rule) => {
-    //   if (rule.itemValue === '') {
-    //     return new Error('请输入密码')
-    //   }
-    //   if (rule.itemValue !== this.formData.psd) {
-    //     return new Error('两次输入的密码不一致')
-    //   }
-    // }
     return {
-      // formData: {
-      //   // psdO: '', // 旧密码
-      //   psd: '', // 新密码
-      //   psdC: '', // 确认密码
-      //   LB: false
-      // },
       formData: {},
       formRules: {
-        // UNAME: [{ required: true, message: '请输入姓名' }],
-        // UPCODE: [{ required: true, message: '请输入账号' }],
-        // psd: [
-        //   { required: true, message: '请输入密码' },
-        //   { min: 6, message: '密码不能少于6位' }
-        // ]
-        // psdC: [
-        //   {
-        //     required: true,
-        //     validator: validatePassword
-        //   },
-        //   { min: 6, message: '密码不能少于6位' }
-        // ]
       },
       tableData: [{}],
-      // tableData: [{
-      //   id: 3,
-      //   code: 'A',
-      //   name: '王小虎1',
-      //   lbItem: [{
-      //     id: 31,
-      //     code: 'AA',
-      //     name: '王小虎2',
-      //     price: 158,
-      //     unit: '次',
-      //     sold: 0,
-      //     fwqx: '',
-      //     fwxz: '',
-      //     fwxj: '',
-      //     fwbz: ''
-      //   }, {
-      //     id: 32,
-      //     code: 'AA',
-      //     name: '张三',
-      //     price: 158,
-      //     unit: '次',
-      //     sold: 0,
-      //     fwqx: '',
-      //     fwxz: '',
-      //     fwxj: '',
-      //     fwbz: ''
-      //   }]
-      // }],
       search: '',
       dialogFormVisibleLbXm: false,
       editName: '',
@@ -401,7 +333,13 @@ export default {
       imageUrl: '',
       fileList: '',
       flag: null,
-      lbDic: []
+      lbDic: [],
+      // 分界线
+      newTitle: '',
+      newDialogFormVisible: false,
+      newFormData: {},
+      fileEvent: null,
+      createId: ''
     }
   },
   created() {
@@ -411,163 +349,117 @@ export default {
   methods: {
     async getLb() {
       const { data } = await getLb()
-      console.log('data===', data)
-      this.tableData = data
+      this.lbDic = data
     },
     async getLbXms() {
       const { data } = await getLbXms()
-      console.log('data===', data)
-      this.lbDic = data
+      this.tableData = data
     },
     searchz(param) {
-      console.log('param', param)
       // var tableDataSearch = []
       // tableDataSearch = this.tableData.map((data) => {
       //   if (data && data.name.includes(param)) {
-      //     console.log('param包含：', data)
       //     return data
       //   }
       // })
       // tableDataSearch = tableDataSearch.filter(res => { return res !== 'undefined' })
       // if (tableDataSearch.length > 0) {
-      //   console.log('tableDataSearch', tableDataSearch)
       //   this.tableData = tableDataSearch
       // }
     },
     handleEdit(index, row) {
-      this.dialogFormVisibleLbXm = true
       if (row.lbItem) {
         // 类别
-        this.refform = 'formLb'
+        this.newDialogFormVisible = true
         this.editName = '类别'
-        row.LB = true
-        this.rowCopyLb = JSON.parse(JSON.stringify(row))
         const rowLb = JSON.parse(JSON.stringify(row))
-        this.formData = rowLb
+        this.newFormData = rowLb
       } else {
         // 项目
+        this.dialogFormVisibleLbXm = true
         this.refform = 'formXm'
         this.editName = '项目'
-        row.LB = false
         this.rowCopyXm = JSON.parse(JSON.stringify(row))
         const rowXm = JSON.parse(JSON.stringify(row))
         this.formData = rowXm
-        console.log(this.formData.picPath)
         if (this.formData.picPath) {
           this.imageUrl = baseURL + this.formData.picPath
         } else {
           this.imageUrl = null
         }
-        console.log(this.imageUrl)
       }
     },
     handleDelete(index, row) {
-      console.log(index, row)
+      if (row.lbItem) {
+        this.delLb(index, row)
+      } else {
+        this.delXm(index, row)
+      }
     },
     reset() {
       if (this.formData.lbItem) {
         this.formData = JSON.parse(JSON.stringify(this.rowCopyLb))
-        // this.formData.picName
         this.imageUrl = baseURL + this.formData.picPath
+        // this.formData.picName
         // this.formData.picType
       } else {
         this.formData = JSON.parse(JSON.stringify(this.rowCopyXm))
       }
     },
-    summit() {
+    summit(event) {
       var that = this
-      if (that.flag) {
-        if (that.flag === 'addLb') {
-          that.$refs['formLb']
-            .validate()
-            .then(async() => {
-              const params = that.formData
-              params.lbItem = ''
-              params.id = ''
-              console.log('保存类别', params)
-              const result = await insertOrUpdateLb(params)
-              if (result && result.code === 0) {
-                that.$message.success('保存成功')
-                that.refresh()
-                console.log(result)
-              } else {
-                that.$message.success('保存失败')
-              }
-            })
-        }
-        if (that.flag === 'addXm') {
-          that.$refs['formXm']
-            .validate()
-            .then(async() => {
-              console.log('保存项目', that.formData)
-              that.formData.id = ''
-              const result = await insertOrUpdateLbItem(that.formData)
-              if (result && result.code === 0) {
-                that.$message.success('保存成功')
-                that.refresh()
-                console.log(result)
-              } else {
-                that.$message.success('保存失败')
-              }
-            })
-        }
+      if (that.formData.id === '') {
+        // that.formData.parent =
+        that.formData.id = that.createId
+        console.log('AA', that.formData.id)
+        that.formData.create = '1'
+        debugger
+        that.$refs['formXm']
+          .validate()
+          .then(async() => {
+            const result = await insertOrUpdateLbItem(that.formData)
+            if (result && result.code === 0) {
+              that.$message.success('保存成功')
+              that.refresh()
+            } else {
+              debugger
+              that.$message.warning('保存失败')
+            }
+          })
+        // const result = insertOrUpdateLbItem(that.formData)
+        // if (result.code === 0) {
+        //   debugger
+        //   // this.imageUrl = baseURL + '/' + result.data
+        //   console.log('AA', result)
+        //   that.getLbXms()
+        //   that.$message.success('保存成功')
+        // } else {
+        //   debugger
+        //   that.$message.warning('保存失败')
+        // }
       } else {
-        console.log('保存类别', that.formData)
-        if (that.formData.LB) {
-          that.$refs['formLb']
-            .validate()
-            .then(async() => {
-              const params = that.formData
-              params.lbItem = ''
-              console.log('保存类别', params)
-              const result = await insertOrUpdateLb(params)
-              if (result && result.code === 0) {
-                that.$message.success('保存成功')
-                that.refresh()
-                console.log(result)
-              } else {
-                that.$message.success('保存失败')
-              }
-            })
-        } else {
-          that.$refs['formXm']
-            .validate()
-            .then(async() => {
-              console.log('保存项目', that.formData)
-              const result = await insertOrUpdateLbItem(that.formData)
-              if (result && result.code === 0) {
-                that.$message.success('保存成功')
-                that.refresh()
-                console.log(result)
-              } else {
-                that.$message.success('保存失败')
-              }
-            })
-        }
+        that.$refs['formXm']
+          .validate()
+          .then(async() => {
+            const result = await insertOrUpdateLbItem(that.formData)
+            if (result && result.code === 0) {
+              that.$message.success('保存成功')
+              that.refresh()
+            } else {
+              debugger
+              that.$message.warning('保存失败')
+            }
+          })
       }
-      that.dialogFormVisibleLbXm = false
-      that.flag = null
+      this.dialogFormVisibleLbXm = false
     },
-    refresh() {
+    async refresh() {
       this.getLbXms()
+      this.getLb()
     },
     closeWin() {
       this.dialogFormVisibleLbXm = false
-    },
-    addLb() {
-      this.formData = {
-        id: '',
-        code: '',
-        name: '',
-        LB: true
-      }
-      // 项目
-      this.editName = '类别-新增'
-      this.flag = 'addLb'
-      this.imageUrl = ''
-      this.dialogFormVisibleLbXm = true
-      this.refform = 'formLb'
-      // this.summit('addLb')
+      this.refresh()
     },
     addXm() {
       this.formData = {
@@ -584,24 +476,46 @@ export default {
         picName: '',
         picPath: '',
         picType: '',
-        LB: false
+        LB: false,
+        parent: ''
       }
       // 项目
       this.editName = '项目-新增'
-      this.flag = 'addXm'
       this.imageUrl = ''
+      this.flag = 'addXm'
       this.dialogFormVisibleLbXm = true
       this.refform = 'formXm'
-      // this.summit('addXm')
     },
     async onChange(event, file, fileList) {
-      const result = await insertOrUpdateLbItemPic(this.formData.id, event)
-      if (result.code === 0) {
-        this.imageUrl = baseURL + '/' + result.data
-        this.getLbXms()
-        this.$message.success('上传成功')
+      var that = this
+      debugger
+      if (that.formData.id === '') {
+        // that.$message.success('添加')
+        // that.fileEvent = event
+        that.formData.id = 'create'
+        const result = await insertOrUpdateLbItemPic(that.formData.id, event)
+        if (result.code === 0) {
+          console.log('A', result)
+          that.imageUrl = baseURL + '/' + result.data.url
+          console.log('A' + that.imageUrl)
+          that.createId = result.data.id
+          console.log('A', that.createId)
+          that.formData.id = ''
+          // that.$message.success('上传成功')
+        } else {
+          // that.$message.warning('上传失败')
+        }
       } else {
-        this.$message.warning('上传失败')
+        // that.$message.success('修改')
+        const result = await insertOrUpdateLbItemPic(that.formData.id, event)
+        if (result.code === 0) {
+          console.log('B', result)
+          that.imageUrl = baseURL + '/' + result.data.url
+          console.log('B' + that.imageUrl)
+          that.$message.success('上传成功')
+        } else {
+          that.$message.warning('上传失败')
+        }
       }
     },
     beforeAvatarUpload(file) {
@@ -616,6 +530,117 @@ export default {
       // }
       // return isJPG && isLt2M
       return isJPG
+    },
+    // 分界线
+    newCoseWin() {
+      this.newDialogFormVisible = false
+      this.refresh()
+    },
+    addLb() {
+      this.newFormData = {
+        id: '',
+        code: '',
+        name: ''
+      }
+      this.newTitle = '类别-添加'
+      this.newDialogFormVisible = true
+    },
+    newCloseWin() {
+      this.newDialogFormVisible = false
+      this.refresh()
+    },
+    newSummit() {
+      var that = this
+      that.$refs['newRefform']
+        .validate()
+        .then(async() => {
+          const params = that.newFormData
+          params.lbItem = '' // 将子项目置为空字符串，避免请求传对象导致请求失败
+          if (params.id === '') {
+            const result = await insertOrUpdateLb(params)
+            if (result && result.code === 0) {
+              that.$message.success('添加成功')
+              that.refresh()
+              this.newDialogFormVisible = false
+            } else {
+              that.$message.warning('添加失败')
+            }
+          } else {
+            const result = await insertOrUpdateLb(params)
+            if (result && result.code === 0) {
+              that.$message.success('保存成功')
+              that.refresh()
+              this.newDialogFormVisible = false
+            } else {
+              that.$message.warning('保存失败')
+            }
+          }
+        })
+    },
+    // 分界线
+    async delLb(index, row) {
+      var that = this
+      that.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        that.delLbz(row)
+      }).catch(() => {
+        that.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
+    },
+    delLbz(row) {
+      var that = this
+      delLb({ code: row.code }).then(result => {
+        if (result && result.code === 0) {
+          that.refresh()
+          that.$message({
+            type: 'success',
+            message: '删除成功'
+          })
+        } else {
+          that.$message({
+            type: 'info',
+            message: result.message
+          })
+        }
+      })
+    },
+    delXmz(row) {
+      var that = this
+      delXm({ code: row.code }).then(result => {
+        if (result && result.code === 0) {
+          that.refresh()
+          that.$message({
+            type: 'success',
+            message: '删除成功'
+          })
+        } else {
+          that.$message({
+            type: 'info',
+            message: result.message
+          })
+        }
+      })
+    },
+    async delXm(index, row) {
+      var that = this
+      that.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        that.delXmz(row)
+      }).catch(() => {
+        that.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
     }
   }
 }
