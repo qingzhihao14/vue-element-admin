@@ -40,6 +40,12 @@ export function logout() {
     method: 'post'
   })
 }
+export function getLb() {
+  return request({
+    url: '/getLb',
+    method: 'get'
+  })
+}
 export function getLbXms() {
   return request({
     url: '/getLbXms',

@@ -86,20 +86,31 @@
             :rules="formRules"
             title-align="right"
           >
+            <!-- v-if="!formData.LB && flag === 'addXm'" -->
             <vxe-form-item
-              v-if="false"
-              title="id"
-              field="id"
+              v-if="editName === '项目-新增'"
+              title="类别"
+              field="sex"
               span="24"
               :item-render="{}"
-              title-overflow="title"
+              title-overflow
             >
               <template #default="params">
-                <vxe-input
-                  v-model="params.data.id"
-                  placeholder="请输入姓名"
-                  clearable
-                />
+                <el-select
+                  v-model="params.data.parent"
+                  v-bind="params.data.parent"
+                  placeholder="请选择"
+                  style="width: 100%"
+                  v-on="params.data.parent"
+                  @change="selectChange"
+                >
+                  <el-option
+                    v-for="item in lbDic"
+                    :key="item.code"
+                    :label="item.name"
+                    :value="item.code"
+                  />
+                </el-select>
               </template>
             </vxe-form-item>
             <vxe-form-item
@@ -292,10 +303,11 @@
                 <el-upload
                   ref="upload"
                   class="avatar-uploader"
+                  action=""
+                  :auto-upload="false"
                   :show-file-list="false"
-                  :on-success="handleAvatarSuccess"
                   :before-upload="beforeAvatarUpload"
-                  :on-progress="onProgress"
+                  :on-change="onChange"
                 >
                   <img v-if="imageUrl" :src="imageUrl" class="avatar">
                   <i v-else class="el-icon-plus avatar-uploader-icon" />
@@ -315,7 +327,8 @@
 <script>
 // import { fetchList } from '@/api/article'
 // @import url("//unpkg.com/element-ui@2.15.7/lib/theme-chalk/index.css");
-import { getLbXms, insertOrUpdateLbItem, insertOrUpdateLb, insertOrUpdateLbItemPic } from '@/api/user'
+import { getLb, getLbXms, insertOrUpdateLbItem, insertOrUpdateLb, insertOrUpdateLbItemPic } from '@/api/user'
+import { baseURL } from '/src/settings.js'
 export default {
   name: 'InlineEditTable',
   data() {
@@ -386,17 +399,25 @@ export default {
       rowCopyLb: {},
       rowCopyXm: {},
       imageUrl: '',
-      fileList: ''
+      fileList: '',
+      flag: null,
+      lbDic: []
     }
   },
   created() {
     this.getLbXms()
+    this.getLb()
   },
   methods: {
+    async getLb() {
+      const { data } = await getLb()
+      console.log('data===', data)
+      this.tableData = data
+    },
     async getLbXms() {
       const { data } = await getLbXms()
       console.log('data===', data)
-      this.tableData = data
+      this.lbDic = data
     },
     searchz(param) {
       console.log('param', param)
@@ -431,6 +452,13 @@ export default {
         this.rowCopyXm = JSON.parse(JSON.stringify(row))
         const rowXm = JSON.parse(JSON.stringify(row))
         this.formData = rowXm
+        console.log(this.formData.picPath)
+        if (this.formData.picPath) {
+          this.imageUrl = baseURL + this.formData.picPath
+        } else {
+          this.imageUrl = null
+        }
+        console.log(this.imageUrl)
       }
     },
     handleDelete(index, row) {
@@ -439,45 +467,86 @@ export default {
     reset() {
       if (this.formData.lbItem) {
         this.formData = JSON.parse(JSON.stringify(this.rowCopyLb))
+        // this.formData.picName
+        this.imageUrl = baseURL + this.formData.picPath
+        // this.formData.picType
       } else {
         this.formData = JSON.parse(JSON.stringify(this.rowCopyXm))
       }
     },
     summit() {
       var that = this
-      console.log('保存类别', that.formData)
-      if (that.formData.LB) {
-        that.$refs['formLb']
-          .validate()
-          .then(async() => {
-            const params = that.formData
-            params.lbItem = ''
-            console.log('保存类别', params)
-            const result = await insertOrUpdateLb(params)
-            if (result && result.code === 0) {
-              that.$message.success('保存成功')
-              that.refresh()
-              console.log(result)
-            } else {
-              that.$message.success('保存失败')
-            }
-          })
+      if (that.flag) {
+        if (that.flag === 'addLb') {
+          that.$refs['formLb']
+            .validate()
+            .then(async() => {
+              const params = that.formData
+              params.lbItem = ''
+              params.id = ''
+              console.log('保存类别', params)
+              const result = await insertOrUpdateLb(params)
+              if (result && result.code === 0) {
+                that.$message.success('保存成功')
+                that.refresh()
+                console.log(result)
+              } else {
+                that.$message.success('保存失败')
+              }
+            })
+        }
+        if (that.flag === 'addXm') {
+          that.$refs['formXm']
+            .validate()
+            .then(async() => {
+              console.log('保存项目', that.formData)
+              that.formData.id = ''
+              const result = await insertOrUpdateLbItem(that.formData)
+              if (result && result.code === 0) {
+                that.$message.success('保存成功')
+                that.refresh()
+                console.log(result)
+              } else {
+                that.$message.success('保存失败')
+              }
+            })
+        }
       } else {
-        that.$refs['formXm']
-          .validate()
-          .then(async() => {
-            console.log('保存项目', that.formData)
-            const result = await insertOrUpdateLbItem(that.formData)
-            if (result && result.code === 0) {
-              that.$message.success('保存成功')
-              that.refresh()
-              console.log(result)
-            } else {
-              that.$message.success('保存失败')
-            }
-          })
+        console.log('保存类别', that.formData)
+        if (that.formData.LB) {
+          that.$refs['formLb']
+            .validate()
+            .then(async() => {
+              const params = that.formData
+              params.lbItem = ''
+              console.log('保存类别', params)
+              const result = await insertOrUpdateLb(params)
+              if (result && result.code === 0) {
+                that.$message.success('保存成功')
+                that.refresh()
+                console.log(result)
+              } else {
+                that.$message.success('保存失败')
+              }
+            })
+        } else {
+          that.$refs['formXm']
+            .validate()
+            .then(async() => {
+              console.log('保存项目', that.formData)
+              const result = await insertOrUpdateLbItem(that.formData)
+              if (result && result.code === 0) {
+                that.$message.success('保存成功')
+                that.refresh()
+                console.log(result)
+              } else {
+                that.$message.success('保存失败')
+              }
+            })
+        }
       }
       that.dialogFormVisibleLbXm = false
+      that.flag = null
     },
     refresh() {
       this.getLbXms()
@@ -486,28 +555,57 @@ export default {
       this.dialogFormVisibleLbXm = false
     },
     addLb() {
-
+      this.formData = {
+        id: '',
+        code: '',
+        name: '',
+        LB: true
+      }
+      // 项目
+      this.editName = '类别-新增'
+      this.flag = 'addLb'
+      this.imageUrl = ''
+      this.dialogFormVisibleLbXm = true
+      this.refform = 'formLb'
+      // this.summit('addLb')
     },
     addXm() {
-
+      this.formData = {
+        id: '',
+        code: '',
+        name: '',
+        price: '',
+        unit: '',
+        sold: '',
+        fwqx: '',
+        fwxz: '',
+        fwxj: '',
+        fwbz: '',
+        picName: '',
+        picPath: '',
+        picType: '',
+        LB: false
+      }
+      // 项目
+      this.editName = '项目-新增'
+      this.flag = 'addXm'
+      this.imageUrl = ''
+      this.dialogFormVisibleLbXm = true
+      this.refform = 'formXm'
+      // this.summit('addXm')
     },
-    handleAvatarSuccess(res, file) {
-      debugger
-      this.imageUrl = URL.createObjectURL(file.raw)
-    },
-    async onProgress(event, file, fileList) {
-      debugger
-      const result = await insertOrUpdateLbItemPic(this.formData.id, file)
-      debugger
+    async onChange(event, file, fileList) {
+      const result = await insertOrUpdateLbItemPic(this.formData.id, event)
       if (result.code === 0) {
-        this.imageUrl = result.data
-        this.$message.warning('上传成功')
+        this.imageUrl = baseURL + '/' + result.data
+        this.getLbXms()
+        this.$message.success('上传成功')
       } else {
         this.$message.warning('上传失败')
       }
     },
     beforeAvatarUpload(file) {
-      const isJPG = file.type === 'image/jpeg'
+      const isJPG = file.type === 'image/jpeg' || file.type === 'image/jpeg' || file.type === 'image/gif' || file.type === 'image/png' || file.type === 'image/bmp'
       // const isLt2M = file.size / 1024 / 1024 < 2
 
       if (!isJPG) {
