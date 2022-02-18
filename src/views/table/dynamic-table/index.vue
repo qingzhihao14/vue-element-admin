@@ -1,16 +1,19 @@
 <template>
   <div class="app-container">
     <el-row :gutter="20">
-      <el-col :span="8"><div class="grid-content bg-purple" /></el-col>
-      <el-col :span="8">
+      <!-- <el-col :span="4"><div class="grid-content bg-purple" /></el-col> -->
+      <el-col :span="24">
         <div class="grid-content bg-purplez">
           <el-table
+            v-loading="listLoading"
             :data="tableData"
             row-key="id"
             border
             default-expand-all
             :tree-props="{children: 'lbItem', hasChildren: 'hasChildren'}"
             height="calc(100vh - 150px)"
+            highlight-current-row
+            :row-class-name="tableRowClassName"
           >
             <!-- <el-table-column
               prop="date"
@@ -42,9 +45,38 @@
               </template>
             </el-table-column>
             <el-table-column
+              prop="sold"
+              label="已售（数量）"
+              min-width="90"
+              align="center"
+            />
+            <el-table-column
+              label="精选"
+              header-align="center"
+              align="center"
+              min-width="90"
+            >
+              <template slot-scope="{row,$index}">
+                <el-switch
+                  v-if="!row.lbItem"
+                  v-model="row.ischoice===1?true:false"
+                  active-text="是"
+                  inactive-text="否"
+                  active-color="#5B7BFA"
+                  inactive-color="#dadde5"
+                  @change="handleChange($index, row)"
+                />
+                <!-- <el-button
+                  size="mini"
+                  @click="handleEdit(scope.$index, scope.row)"
+                >编辑</el-button> -->
+              </template>
+            </el-table-column>
+            <el-table-column
               label="操作"
               header-align="center"
               align="center"
+              min-width="90"
             >
               <!-- <template slot="header" slot-scope="scope">
                 搜索：
@@ -55,11 +87,10 @@
                   @keyup.enter="searchz(search)"
                 >
               </template> -->
-              <template
-                slot-scope="scope"
-              >
+              <template slot-scope="scope">
                 <el-button
                   size="mini"
+                  type="primary"
                   @click="handleEdit(scope.$index, scope.row)"
                 >编辑</el-button>
                 <el-button
@@ -72,10 +103,14 @@
           </el-table>
         </div>
       </el-col>
-      <el-col :span="8"><div class="grid-content bg-purple" /></el-col>
+      <!-- <el-col :span="4"><div class="grid-content bg-purple" /></el-col> -->
     </el-row>
     <!-- 编辑添加类别 -->
-    <el-dialog :title="newTitle" :visible.sync="newDialogFormVisible" @close="newCoseWin">
+    <el-dialog
+      :title="newTitle"
+      :visible.sync="newDialogFormVisible"
+      @close="newCoseWin"
+    >
       <el-container>
         <el-main>
           <vxe-form
@@ -116,15 +151,23 @@
                 />
               </template>
             </vxe-form-item>
-          </vxe-form></el-main>
+          </vxe-form>
+        </el-main>
         <el-footer style="text-align: center">
           <!-- <el-button @click="reset">重置</el-button> -->
-          <el-button type="primary" @click="newSummit">保存</el-button>
+          <el-button
+            type="primary"
+            @click="newSummit"
+          >保存</el-button>
         </el-footer>
       </el-container>
     </el-dialog>
     <!-- 编辑、添加项目 -->
-    <el-dialog :title="editName" :visible.sync="dialogFormVisibleLbXm" @close="closeWin">
+    <el-dialog
+      :title="editName"
+      :visible.sync="dialogFormVisibleLbXm"
+      @close="closeWin"
+    >
       <el-container>
         <el-main>
           <vxe-form
@@ -299,14 +342,25 @@
                   :before-upload="beforeAvatarUpload"
                   :on-change="onChange"
                 >
-                  <img v-if="imageUrl" :src="imageUrl" class="avatar">
-                  <i v-else class="el-icon-plus avatar-uploader-icon" />
+                  <img
+                    v-if="imageUrl"
+                    :src="imageUrl"
+                    class="avatar"
+                  >
+                  <i
+                    v-else
+                    class="el-icon-plus avatar-uploader-icon"
+                  />
                 </el-upload>
               </template>
             </vxe-form-item>
-          </vxe-form></el-main>
+          </vxe-form>
+        </el-main>
         <el-footer style="text-align: center">
-          <el-button type="primary" @click="summit">保存</el-button>
+          <el-button
+            type="primary"
+            @click="summit"
+          >保存</el-button>
         </el-footer>
       </el-container>
     </el-dialog>
@@ -314,7 +368,7 @@
 </template>
 
 <script>
-import { getLb, getLbXms, insertOrUpdateLbItem, insertOrUpdateLb, insertOrUpdateLbItemPic, delLb, delXm } from '@/api/user'
+import { getLb, getLbXms, insertOrUpdateLbItem, insertOrUpdateLb, insertOrUpdateLbItemPic, delLb, delXm, changeIsChoice } from '@/api/user'
 import { baseURL } from '/src/settings.js'
 export default {
   name: 'InlineEditTable',
@@ -339,7 +393,9 @@ export default {
       newDialogFormVisible: false,
       newFormData: {},
       fileEvent: null,
-      createId: ''
+      createId: '',
+      exchange: true,
+      listLoading: true
     }
   },
   created() {
@@ -347,12 +403,38 @@ export default {
     this.getLb()
   },
   methods: {
+    handleChange(index, params, value) {
+      var that = this
+      that.listLoading = true
+      params.ischoice = params.ischoice === 1 ? 0 : 1
+      changeIsChoice({ 'ischoice': params.ischoice, 'id': params.id }).then(result => {
+        if (result && result.code === 0) {
+          setTimeout(() => {
+            this.listLoading = false
+          }, 1.5 * 100)
+          that.refresh()
+          // that.$message.success('保存成功')
+          that.listLoading = true
+        } else {
+          setTimeout(() => {
+            this.listLoading = false
+          }, 1.5 * 100)
+          that.refresh()
+          that.$message.warning('变更失败')
+          that.listLoading = true
+        }
+      })
+    },
     async getLb() {
       const { data } = await getLb()
       this.lbDic = data
     },
     async getLbXms() {
+      this.listLoading = true
       const { data } = await getLbXms()
+      setTimeout(() => {
+        this.listLoading = false
+      }, 1.5 * 100)
       this.tableData = data
     },
     searchz(param) {
@@ -413,7 +495,6 @@ export default {
         that.formData.id = that.createId
         console.log('AA', that.formData.id)
         that.formData.create = '1'
-        debugger
         that.$refs['formXm']
           .validate()
           .then(async() => {
@@ -422,19 +503,16 @@ export default {
               that.$message.success('保存成功')
               that.refresh()
             } else {
-              debugger
               that.$message.warning('保存失败')
             }
           })
         // const result = insertOrUpdateLbItem(that.formData)
         // if (result.code === 0) {
-        //   debugger
         //   // this.imageUrl = baseURL + '/' + result.data
         //   console.log('AA', result)
         //   that.getLbXms()
         //   that.$message.success('保存成功')
         // } else {
-        //   debugger
         //   that.$message.warning('保存失败')
         // }
       } else {
@@ -446,7 +524,6 @@ export default {
               that.$message.success('保存成功')
               that.refresh()
             } else {
-              debugger
               that.$message.warning('保存失败')
             }
           })
@@ -488,7 +565,6 @@ export default {
     },
     async onChange(event, file, fileList) {
       var that = this
-      debugger
       if (that.formData.id === '') {
         // that.$message.success('添加')
         // that.fileEvent = event
@@ -641,60 +717,77 @@ export default {
           message: '已取消删除'
         })
       })
+    },
+    tableRowClassName({ row, rowIndex }) {
+      if (row.lbItem) {
+        return 'success-row'
+      } else if (row) {
+        // return 'warning-row'
+      }
+      return ''
     }
+
   }
 }
 </script>
 
 <style>
-  .el-row {
-    margin-bottom: 20px;
-    /* &:last-child {
+.el-row {
+  margin-bottom: 20px;
+  /* &:last-child {
       margin-bottom: 0;
     } */
-  }
-  .el-col {
-    border-radius: 4px;
-  }
-  .bg-purple-dark {
-    background: #99a9bf;
-  }
-  .bg-purplez {
-    background: #d3dce6;
-  }
-  .bg-purple-light {
-    background: #e5e9f2;
-  }
-  .grid-content {
-    border-radius: 4px;
-    min-height: calc(100vh - 150px);
-  }
-  .row-bg {
-    padding: 10px 0;
-    background-color: #f9fafc;
+}
+.el-col {
+  border-radius: 4px;
+}
+.bg-purple-dark {
+  background: #99a9bf;
+}
+.bg-purplez {
+  background: #d3dce6;
+}
+.bg-purple-light {
+  background: #e5e9f2;
+}
+.grid-content {
+  border-radius: 4px;
+  min-height: calc(100vh - 150px);
+}
+.row-bg {
+  padding: 10px 0;
+  background-color: #f9fafc;
+}
+
+.avatar-uploader .el-upload {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.avatar-uploader .el-upload:hover {
+  border-color: #409eff;
+}
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  line-height: 178px;
+  text-align: center;
+}
+.avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
+}
+
+  .el-table .warning-row {
+    background: oldlace;
   }
 
-  .avatar-uploader .el-upload {
-    border: 1px dashed #d9d9d9;
-    border-radius: 6px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-  }
-  .avatar-uploader .el-upload:hover {
-    border-color: #409EFF;
-  }
-  .avatar-uploader-icon {
-    font-size: 28px;
-    color: #8c939d;
-    width: 178px;
-    height: 178px;
-    line-height: 178px;
-    text-align: center;
-  }
-  .avatar {
-    width: 178px;
-    height: 178px;
-    display: block;
+  .el-table .success-row {
+    background: #f0f9eb;
   }
 </style>

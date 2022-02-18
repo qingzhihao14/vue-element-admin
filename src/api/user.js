@@ -110,3 +110,11 @@ export function insertOrUpdateLb(data) {
     data
   })
 }
+export function changeIsChoice(params) {
+  return request({
+    url: '/changeIsChoice',
+    method: 'get',
+    params
+  })
+}
+

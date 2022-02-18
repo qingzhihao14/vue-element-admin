@@ -160,7 +160,6 @@ export default {
           this.$store.dispatch('user/login', this.loginForm)
             .then((param) => {
               if (param.code === 0) {
-                debugger
                 this.$message.success('登陆成功！')
                 this.$router.push({ path: '/dashboard', query: this.otherQuery })
                 this.loading = false

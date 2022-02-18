@@ -5,18 +5,20 @@ import Layout from '@/layout'
 const tableRouter = {
   path: '/table',
   component: Layout,
-  redirect: '/table/complex-table',
-  name: 'Table',
+  redirect: '/table/complexTable',
+  name: '管理',
   meta: {
-    title: 'Table',
+    title: '管理',
     icon: 'wechat'
   },
+  alwaysShow: true,
+  opened: true,
   children: [
     {
       path: 'dynamic-table',
       component: () => import('@/views/table/dynamic-table/index'),
       name: 'DynamicTable',
-      meta: { title: '类别项维护' }
+      meta: { title: '商品维护' }
     },
     {
       path: 'drag-table',
@@ -28,13 +30,13 @@ const tableRouter = {
       path: 'inline-edit-table',
       component: () => import('@/views/table/inline-edit-table'),
       name: 'InlineEditTable',
-      meta: { title: 'Inline Edit' }
+      meta: { title: '用户信息' }
     },
     {
-      path: 'complex-table',
-      component: () => import('@/views/table/complex-table'),
+      path: 'complexTable',
+      component: () => import('@/views/table/complexTable'),
       name: 'ComplexTable',
-      meta: { title: 'Complex Table' }
+      meta: { title: '访问列表' }
     }
   ]
 }
