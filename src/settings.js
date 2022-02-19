@@ -1,6 +1,7 @@
 module.exports = {
   //
   baseURL: 'http://localhost:8521',
+  // baseURL: 'http://static.asia:70',
 
   title: 'Vue Element Admin',
 
