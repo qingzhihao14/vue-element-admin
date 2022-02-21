@@ -151,6 +151,36 @@
                 />
               </template>
             </vxe-form-item>
+            <vxe-form-item
+              title="示例图片"
+              field="MOBILE"
+              span="24"
+              :item-render="{}"
+              title-overflow="title"
+            >
+              <!-- <template #default="params"> -->
+              <template #default>
+                <el-upload
+                  ref="uploadXm"
+                  class="avatar-uploader"
+                  action=""
+                  :auto-upload="false"
+                  :show-file-list="false"
+                  :before-upload="beforeAvatarUpload"
+                  :on-change="onChangeLb"
+                >
+                  <img
+                    v-if="imageUrlLb"
+                    :src="imageUrlLb"
+                    class="avatar"
+                  >
+                  <i
+                    v-else
+                    class="el-icon-plus avatar-uploader-icon"
+                  />
+                </el-upload>
+              </template>
+            </vxe-form-item>
           </vxe-form>
         </el-main>
         <el-footer style="text-align: center">
@@ -368,7 +398,10 @@
 </template>
 
 <script>
-import { getLb, getLbXms, insertOrUpdateLbItem, insertOrUpdateLb, insertOrUpdateLbItemPic, delLb, delXm, changeIsChoice } from '@/api/user'
+import { getLb, getLbXms,
+  insertOrUpdateLbItem,
+  // insertOrUpdateLb,
+  insertOrUpdateLbItemPic, delLb, delXm, changeIsChoice, insertOrUpdateLbPic, insertOrUpdateLbs } from '@/api/user'
 import { baseURL } from '/src/settings.js'
 export default {
   name: 'InlineEditTable',
@@ -385,6 +418,7 @@ export default {
       rowCopyLb: {},
       rowCopyXm: {},
       imageUrl: '',
+      imageUrlLb: '',
       fileList: '',
       flag: null,
       lbDic: [],
@@ -394,6 +428,7 @@ export default {
       newFormData: {},
       fileEvent: null,
       createId: '',
+      createIdLb: '',
       exchange: true,
       listLoading: true
     }
@@ -456,6 +491,12 @@ export default {
         this.editName = '类别'
         const rowLb = JSON.parse(JSON.stringify(row))
         this.newFormData = rowLb
+        debugger
+        if (this.newFormData.picPath) {
+          this.imageUrlLb = baseURL + this.newFormData.picPath
+        } else {
+          this.imageUrlLb = null
+        }
       } else {
         // 项目
         this.dialogFormVisibleLbXm = true
@@ -501,8 +542,10 @@ export default {
             const result = await insertOrUpdateLbItem(that.formData)
             if (result && result.code === 0) {
               that.$message.success('保存成功')
+              this.createId = ''
               that.refresh()
             } else {
+              this.createId = ''
               that.$message.warning('保存失败')
             }
           })
@@ -594,6 +637,37 @@ export default {
         }
       }
     },
+    async onChangeLb(event, file, fileList) {
+      var that = this
+      if (that.newFormData.id === '') {
+        // that.$message.success('添加')
+        // that.fileEvent = event
+        that.newFormData.id = 'create'
+        const result = await insertOrUpdateLbPic(that.newFormData.id, event)
+        if (result.code === 0) {
+          console.log('A', result)
+          that.imageUrlLb = baseURL + '/' + result.data.url
+          console.log('A' + that.imageUrlLb)
+          that.createIdLb = result.data.id
+          console.log('A', that.createIdLb)
+          that.newFormData.id = ''
+          // that.$message.success('上传成功')
+        } else {
+          // that.$message.warning('上传失败')
+        }
+      } else {
+        // that.$message.success('修改')
+        const result = await insertOrUpdateLbPic(that.newFormData.id, event)
+        if (result.code === 0) {
+          console.log('B', result)
+          that.imageUrlLb = baseURL + '/' + result.data.url
+          console.log('B' + that.imageUrlLb)
+          that.$message.success('上传成功')
+        } else {
+          that.$message.warning('上传失败')
+        }
+      }
+    },
     beforeAvatarUpload(file) {
       const isJPG = file.type === 'image/jpeg' || file.type === 'image/jpeg' || file.type === 'image/gif' || file.type === 'image/png' || file.type === 'image/bmp'
       // const isLt2M = file.size / 1024 / 1024 < 2
@@ -616,8 +690,12 @@ export default {
       this.newFormData = {
         id: '',
         code: '',
-        name: ''
+        name: '',
+        picName: '',
+        picPath: '',
+        picType: ''
       }
+      this.imageUrlLb = ''
       this.newTitle = '类别-添加'
       this.newDialogFormVisible = true
     },
@@ -631,18 +709,24 @@ export default {
         .validate()
         .then(async() => {
           const params = that.newFormData
+          console.log('AA', that.newFormData.id)
           params.lbItem = '' // 将子项目置为空字符串，避免请求传对象导致请求失败
           if (params.id === '') {
-            const result = await insertOrUpdateLb(params)
+            params.id = that.createIdLb
+            params.create = '1'
+            console.log('createIdLb', that.createIdLb)
+            const result = await insertOrUpdateLbs(params)
             if (result && result.code === 0) {
               that.$message.success('添加成功')
               that.refresh()
               this.newDialogFormVisible = false
+              this.createIdLb = ''
             } else {
               that.$message.warning('添加失败')
+              this.createIdLb = ''
             }
           } else {
-            const result = await insertOrUpdateLb(params)
+            const result = await insertOrUpdateLbs(params)
             if (result && result.code === 0) {
               that.$message.success('保存成功')
               that.refresh()
@@ -688,6 +772,7 @@ export default {
     },
     delXmz(row) {
       var that = this
+      console.log('delrow=', row)
       delXm({ code: row.code }).then(result => {
         if (result && result.code === 0) {
           that.refresh()

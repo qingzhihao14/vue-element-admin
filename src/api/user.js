@@ -78,6 +78,34 @@ export function insertOrUpdateLbItemPic(id, filesCsLd) {
   })
 }
 
+export function insertOrUpdateLbPic(id, filesCsLd) {
+  const param = new FormData()
+  param.append('file', filesCsLd.raw)
+  param.append('id', id)
+  return request({
+    headers: { 'Content-Type': 'multipart/form-data' },
+    url: '/insertOrUpdateLbPic',
+    method: 'post',
+    data: param
+  })
+}
+export function insertOrUpdateLbs(formData) {
+  const param = new FormData()
+  // param.append('file', filesCsLd.raw)
+  param.append('id', formData.id)
+  param.append('create', formData.create)
+  param.append('code', formData.code)
+  param.append('name', formData.name)
+  param.append('picName', formData.picName)
+  param.append('picPath', formData.picPath)
+  param.append('picPath', formData.picPath)
+  return request({
+    headers: { 'Content-Type': 'multipart/form-data' },
+    url: '/insertOrUpdateLbs',
+    method: 'post',
+    data: param
+  })
+}
 export function insertOrUpdateLbItem(formData) {
   const param = new FormData()
   // param.append('file', filesCsLd.raw)
