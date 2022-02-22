@@ -145,4 +145,24 @@ export function changeIsChoice(params) {
     params
   })
 }
-
+export function findPage(data) {
+  return request({
+    url: '/findPage',
+    method: 'post',
+    data
+  })
+}
+export function cancel(data) {
+  return request({
+    url: '/api/wx-pay/cancel/',
+    method: 'post',
+    data
+  })
+}
+export function refunds(data) {
+  return request({
+    url: '/api/wx-pay/refunds/',
+    method: 'post',
+    data
+  })
+}

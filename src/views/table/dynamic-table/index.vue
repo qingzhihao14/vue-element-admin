@@ -491,7 +491,6 @@ export default {
         this.editName = '类别'
         const rowLb = JSON.parse(JSON.stringify(row))
         this.newFormData = rowLb
-        debugger
         if (this.newFormData.picPath) {
           this.imageUrlLb = baseURL + this.newFormData.picPath
         } else {
