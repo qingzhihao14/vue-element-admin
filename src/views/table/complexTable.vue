@@ -8,7 +8,7 @@
         <div
           class="filter-container"
         >
-          <el-input v-model="listQuery.title" placeholder="访问列表" style="width: 200px;" class="filter-item" size="mini" @keyup.enter.native="handleFilter" />
+          <el-input v-model="listQuery.title" placeholder="请输入联系方式.." style="width: 200px;" class="filter-item" size="mini" @keyup.enter.native="handleFilter()" />
           <!-- <el-select v-model="listQuery.importance" placeholder="Imp" clearable style="width: 90px" class="filter-item">
             <el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item" />
           </el-select>
@@ -18,7 +18,7 @@
           <el-select v-model="listQuery.sort" style="width: 140px" class="filter-item" @change="handleFilter">
             <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" />
           </el-select> -->
-          <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" size="mini" @click="handleFilter">
+          <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" size="mini" @click="handleFilter()">
             Search
           </el-button>
           <!-- <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
@@ -41,20 +41,81 @@
           fit
           highlight-current-row
           style="width: 100%;"
-          height="644px"
+          height="calc(100vh - 220px)"
           @sort-change="sortChange"
         >
-          <el-table-column label="ID" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
+          <el-table-column
+            type="index"
+            width="50"
+            align="center"
+            fixed
+          />
+          <el-table-column
+            v-if="false"
+            label="ID"
+            prop="id"
+            sortable="custom"
+            align="center"
+            :class-name="getSortClass('id')"
+          >
             <template slot-scope="{row}">
               <span>{{ row.id }}</span>
             </template>
-          </el-table-column>
-          <el-table-column label="Date" width="150px" align="center">
+          </el-table-column><el-table-column label="用户ID" prop="id" align="center">
             <template slot-scope="{row}">
-              <span>{{ row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+              <span>{{ row.userId }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="Title" min-width="150px">
+          <!-- <el-table-column label="用户" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')"> -->
+          <el-table-column label="用户" prop="id" align="center">
+            <template slot-scope="{row}">
+              <span>{{ row.username?row.name: row.username }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="性别" width="135px" align="center">
+            <template slot-scope="{row}">
+              <span>{{ row.sex==='1'?'男':'女' }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="头像" align="center">
+            <template slot-scope="{row}">
+              <!-- <span>{{ row.avatar?row.avatar:'无' }}</span> -->
+              <picture>
+                <img :src="row.avatar" style="width:auto;">
+              </picture>
+            </template>
+          </el-table-column>
+          <el-table-column label="访问时间" width="135px" align="center">
+            <template slot-scope="{row}">
+              <span>{{ row.createTime | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+            </template>
+          </el-table-column>
+          <!-- <el-table-column label="用户" prop="id" align="center" width="120">
+            <template slot-scope="{row}">
+              <span>{{ row.userId }}</span>
+            </template>
+          </el-table-column> -->
+          <el-table-column label="访问" align="center">
+            <template slot-scope="{row}">
+              <span>{{ row.urlName }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="访问路径" prop="id" align="center">
+            <template slot-scope="{row}">
+              <span>{{ row.url }}</span>
+            </template>
+          </el-table-column>
+          <!-- <el-table-column label="下单时间" width="135px" align="center">
+            <template slot-scope="{row}">
+              <span>{{ row.createTime | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="更新时间" width="135px" align="center">
+            <template slot-scope="{row}">
+              <span>{{ row.updateTime | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+            </template>
+          </el-table-column> -->
+          <!-- <el-table-column label="Title" min-width="150px">
             <template slot-scope="{row}">
               <span class="link-type" @click="handleUpdate(row)">{{ row.title }}</span>
               <el-tag>{{ row.type | typeFilter }}</el-tag>
@@ -87,23 +148,26 @@
                 {{ row.status }}
               </el-tag>
             </template>
-          </el-table-column>
-          <el-table-column label="Actions" align="center" width="230" class-name="small-padding fixed-width">
-            <template slot-scope="{row,$index}">
-              <el-button type="primary" size="mini" @click="handleUpdate(row)">
+          </el-table-column> -->
+          <!-- <el-table-column fixed="right" label="操作" align="center" width="230" class-name="small-padding fixed-width"> -->
+          <!-- <template slot-scope="{row,$index}"> -->
+          <!-- <template slot-scope="{row}"> -->
+          <!-- <el-button type="primary" size="mini" @click="handleUpdate(row)">
                 Edit
-              </el-button>
-              <el-button v-if="row.status!='published'" size="mini" type="success" @click="handleModifyStatus(row,'published')">
+              </el-button> -->
+          <!-- <el-button v-if="row.status!='published'" size="mini" type="success" @click="handleModifyStatus(row,'published',$index)">
                 Publish
-              </el-button>
-              <el-button v-if="row.status!='draft'" size="mini" @click="handleModifyStatus(row,'draft')">
+              </el-button> -->
+          <!-- <el-button v-if="row.status!='draft'" size="mini" @click="handleModifyStatus(row,'draft')">
                 Draft
-              </el-button>
-              <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row,$index)">
+              </el-button> -->
+          <!-- <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row,$index)">
                 Delete
-              </el-button>
-            </template>
-          </el-table-column>
+              </el-button> -->
+          <!-- <el-button v-if="row.orderStatus === '未支付'" type="text" @click="cancelOrder(row.orderNo)">取消</el-button> -->
+          <!-- <el-button v-if="row.orderStatus === '支付成功'" type="text" @click="refundOrder(row.orderNo)">退款</el-button> -->
+          <!-- </template> -->
+          <!-- </el-table-column> -->
         </el-table>
       </el-main>
       <el-footer style="height:auto">
@@ -111,7 +175,26 @@
       </el-footer>
     </el-container>
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+    <!-- 退款对话框 -->
+    <el-dialog
+      :visible.sync="refundDialogVisible"
+      width="350px"
+      center
+      @close="closeDialog"
+    >
+      <el-form>
+        <el-form-item label="退款原因">
+          <el-select v-model="reason" placeholder="请选择退款原因">
+            <el-option label="不喜欢" value="不喜欢" />
+            <el-option label="买错了" value="买错了" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" :disabled="refundSubmitBtnDisabled" @click="toRefunds()">确 定</el-button>
+      </div>
+    </el-dialog>
+    <!-- <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
         <el-form-item label="Type" prop="type">
           <el-select v-model="temp.type" class="filter-item" placeholder="Please select">
@@ -144,9 +227,9 @@
           Confirm
         </el-button>
       </div>
-    </el-dialog>
+    </el-dialog> -->
 
-    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
+    <!-- <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
       <el-table :data="pvData" border fit highlight-current-row style="width: 100%">
         <el-table-column prop="key" label="Channel" />
         <el-table-column prop="pv" label="Pv" />
@@ -154,7 +237,7 @@
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="dialogPvVisible = false">Confirm</el-button>
       </span>
-    </el-dialog>
+    </el-dialog> -->
   </div>
 </template>
 
@@ -163,7 +246,7 @@ import { fetchPv, createArticle, updateArticle } from '@/api/article'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-
+import { findLogPage, cancel, refunds } from '@/api/user'
 const calendarTypeOptions = [
   { key: 'CN', display_name: 'China' },
   { key: 'US', display_name: 'USA' },
@@ -195,13 +278,17 @@ export default {
   },
   data() {
     return {
+      refundDialogVisible: false, // 退款
+      orderNo: '', // 退款订单号
+      reason: '', // 退款原因,
+      refundSubmitBtnDisabled: false, // 防止重复提交
       tableKey: 0,
       list: null,
       total: 0,
       listLoading: true,
       listQuery: {
         page: 1,
-        limit: 20,
+        limit: 10,
         importance: undefined,
         title: undefined,
         type: undefined,
@@ -213,16 +300,18 @@ export default {
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        type: '',
-        status: 'published'
+        // 'id': '00783dda824049f8bb401a02152fb6df',
+        // 'name': 'A，玛卡巴卡',,
+        // 'username': ''
+        // 'urlName': '根据【微信code】登录【个人】',
+        // 'param': '{"code":"001rzb100FAGmN1c4o100LU5E11rzb1Q"}',
+        // 'createTime': 1645338480000,
+        // 'sex': 0,
+        // 'avatar': 'https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTKIibwdCFCCobpJkc0ibTl1BRo0onG5lElHDDiaJ5lj5flokt73d2NHHEKaAUz3v4GgIGibHjzeHG3P1Q/132',
+        // 'userId': 'oIui_5WhAkDRvnDJZeaZaOshg1LM',
+        // 'url': '/login'
       },
       dialogFormVisible: false,
-      dialogStatus: '',
       textMap: {
         update: 'Edit',
         create: 'Create'
@@ -234,37 +323,150 @@ export default {
         timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
         title: [{ required: true, message: 'title is required', trigger: 'blur' }]
       },
-      downloadLoading: false
+      downloadLoading: false,
+      new_order_count: 0
     }
   },
   created() {
     this.getList()
+    this.setTiming()
+  },
+  destroyed() {
+    window.clearInterval(this.timed)// 销毁定时任务
   },
   methods: {
-    getList() {
-      this.listLoading = true
+    // 设置定时获取列表
+    setTiming() {
+      this.timed = window.setInterval(() => {
+        setTimeout(() => {
+          // if(){
 
-      this.list = [{ 'id': 1, 'timestamp': 803380321626, 'author': 'Elizabeth', 'reviewer': 'Charles', 'title': 'Phto Umfhyvn Bbpctd Gppelbjobs Huha Cod Qcewjhx', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 49.69, 'importance': 2, 'type': 'JP', 'status': 'draft', 'display_time': '1971-09-25 22:21:09', 'comment_disabled': true, 'pageviews': 4435, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 2, 'timestamp': 203661565471, 'author': 'Jeffrey', 'reviewer': 'Joseph', 'title': 'Liutpj Srzxsyo Qbvto Jrek Ktph Lvxggjitej', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 23.07, 'importance': 2, 'type': 'US', 'status': 'published', 'display_time': '1980-10-01 05:34:34', 'comment_disabled': true, 'pageviews': 4231, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 3, 'timestamp': 1575937832164, 'author': 'Kevin', 'reviewer': 'James', 'title': 'Kesnq Fwmtlufih Qpie Twfm Bkkbzkx Qkct Ljjanvm', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 83.28, 'importance': 2, 'type': 'US', 'status': 'draft', 'display_time': '2019-10-25 20:18:19', 'comment_disabled': true, 'pageviews': 4492, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 4, 'timestamp': 893621388286, 'author': 'Thomas', 'reviewer': 'Brian', 'title': 'Djfbcnvht Twpvmd Qjbw Tvrq Xftjujkf Pomrxapk Mobs Dplr Tfijiamu', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 71.13, 'importance': 2, 'type': 'JP', 'status': 'published', 'display_time': '1974-03-05 12:45:40', 'comment_disabled': true, 'pageviews': 1997, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 5, 'timestamp': 417094195427, 'author': 'Jessica', 'reviewer': 'Ruth', 'title': 'Bxtit Vumcdmvork Dorkn Smunohkhki Qkvqwlk Ptyhgk Krrjend Tlrezmd Byfmeau Qqdfjp', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 54.75, 'importance': 2, 'type': 'US', 'status': 'draft', 'display_time': '1979-11-30 02:01:46', 'comment_disabled': true, 'pageviews': 4501, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 6, 'timestamp': 1301855019498, 'author': 'Jeffrey', 'reviewer': 'Karen', 'title': 'Iksk Fjgpdxwb Fhlw Wdzht Xxyixe Qknrqwtdsv Dqllmsggu Uuauosnld Kwqs Cdld', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 5.47, 'importance': 1, 'type': 'US', 'status': 'draft', 'display_time': '1994-04-13 05:13:29', 'comment_disabled': true, 'pageviews': 2336, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 7, 'timestamp': 1375880283337, 'author': 'Steven', 'reviewer': 'Larry', 'title': 'Uuqjfylfwh Rsfgw Rxwxla Pmom Igrkgu', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 0.95, 'importance': 2, 'type': 'JP', 'status': 'draft', 'display_time': '1984-12-30 12:27:26', 'comment_disabled': true, 'pageviews': 4354, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 8, 'timestamp': 836327661361, 'author': 'Gary', 'reviewer': 'Daniel', 'title': 'Qplyhouldr Riwike Hcidbmh Jqghzh Fttc Gffgifgdu Dtffwylfw Lhngvk', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 74.43, 'importance': 2, 'type': 'CN', 'status': 'draft', 'display_time': '1970-10-10 15:01:51', 'comment_disabled': true, 'pageviews': 540, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 9, 'timestamp': 1249461168915, 'author': 'Carol', 'reviewer': 'Sarah', 'title': 'Yxuorxy Ulfi Pywcfbtlg Mujjwuh Jeoitnx', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 66.71, 'importance': 3, 'type': 'US', 'status': 'draft', 'display_time': '1999-08-01 14:59:51', 'comment_disabled': true, 'pageviews': 2206, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 10, 'timestamp': 991010925276, 'author': 'Edward', 'reviewer': 'Lisa', 'title': 'Kxyj Hloyfd Djcq Kxqmdmfdsb Ucixtcx Jngclip', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 72.43, 'importance': 2, 'type': 'CN', 'status': 'draft', 'display_time': '2002-09-07 14:57:22', 'comment_disabled': true, 'pageviews': 4718, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 11, 'timestamp': 1002220180868, 'author': 'Nancy', 'reviewer': 'Sandra', 'title': 'Wgswkyc Lmmtzbeu Jxhs Xvno Ovtnm Otfpumcf Jfqbenvap', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 6.62, 'importance': 2, 'type': 'JP', 'status': 'draft', 'display_time': '2018-11-16 10:29:07', 'comment_disabled': true, 'pageviews': 1985, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 12, 'timestamp': 47657650328, 'author': 'Mary', 'reviewer': 'Matthew', 'title': 'Tagjo Veimsieot Pueippd Zkjnqq Tzbv Ttnx', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 88.88, 'importance': 2, 'type': 'JP', 'status': 'published', 'display_time': '1979-11-18 03:50:42', 'comment_disabled': true, 'pageviews': 738, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 13, 'timestamp': 436962300263, 'author': 'Brenda', 'reviewer': 'Thomas', 'title': 'Nsdio Ezxcml Ybslm Ufwk Eflmiaozy Edfsugk', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 33.72, 'importance': 2, 'type': 'JP', 'status': 'draft', 'display_time': '1973-09-30 10:38:33', 'comment_disabled': true, 'pageviews': 1552, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 14, 'timestamp': 1211302507717, 'author': 'Dorothy', 'reviewer': 'Jason', 'title': 'Eopryw Yswjcvoub Hoqsh Xdvp Vjsvgtuy Pnpp Jpqoqcs', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 44.42, 'importance': 3, 'type': 'JP', 'status': 'draft', 'display_time': '2001-06-08 08:50:07', 'comment_disabled': true, 'pageviews': 2039, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 15, 'timestamp': 57519122580, 'author': 'Eric', 'reviewer': 'Jeffrey', 'title': 'Jsjneeg Rfcywbt Ennh Cpdvrq Csdnhmxbr Kuwk Rdoghbihs Irccm', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 22.44, 'importance': 2, 'type': 'EU', 'status': 'published', 'display_time': '1990-08-28 20:08:46', 'comment_disabled': true, 'pageviews': 4250, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 16, 'timestamp': 1331305306184, 'author': 'Kimberly', 'reviewer': 'Gary', 'title': 'Cfuqrg Pcdl Epmdpxlodo Jwhjgep Szqnim Ohwltyy Tsrxkuvfy Wbbvk Mcxsyrxd', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 26.03, 'importance': 3, 'type': 'US', 'status': 'published', 'display_time': '2020-10-12 21:44:35', 'comment_disabled': true, 'pageviews': 915, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 17, 'timestamp': 737661074299, 'author': 'Anthony', 'reviewer': 'Scott', 'title': 'Imn Dvmnidlvp Lpylchwui Vtzzbtex Pybogro Ooxhfsozk', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 53.16, 'importance': 2, 'type': 'US', 'status': 'draft', 'display_time': '2011-03-15 10:36:47', 'comment_disabled': true, 'pageviews': 4298, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 18, 'timestamp': 111502496706, 'author': 'Jessica', 'reviewer': 'Christopher', 'title': 'Krroywn Syudufqw Gczhbjr Gcrm Wsbr Qxqvnp Dzgi Ekbfls Ycefwpceid Garqgum', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 61.13, 'importance': 3, 'type': 'US', 'status': 'draft', 'display_time': '1970-01-07 21:19:02', 'comment_disabled': true, 'pageviews': 2385, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 19, 'timestamp': 233294636091, 'author': 'Maria', 'reviewer': 'Richard', 'title': 'Ktxhz Kguzcvvfl Zaofe Cyhxxxdb Ddyetbya Pjxd', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 9.55, 'importance': 2, 'type': 'US', 'status': 'published', 'display_time': '1999-05-01 00:13:30', 'comment_disabled': true, 'pageviews': 3531, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 20, 'timestamp': 1518814286075, 'author': 'Carol', 'reviewer': 'Elizabeth', 'title': 'Cgbstrg Sjzchlkd Qqnokrui Scqpp Nmqrqfucow Rhusz Cdeoriql', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 26.67, 'importance': 2, 'type': 'EU', 'status': 'published', 'display_time': '1980-11-22 20:56:47', 'comment_disabled': true, 'pageviews': 2665, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }]
-      this.total = 100
+          // }
+          // this.getList()
+        }, 0)
+      }, 3000)// 3s获取一次
+    },
+    // 用户取消订单
+    async cancelOrder(orderNo) {
+      await cancel(orderNo).then(response => {
+        this.$message.success(response.message)
+        // 刷新订单列表
+        this.getList()
+      })
+    },
+    // 退款对话框
+    refundOrder(orderNo) {
+      this.refundDialogVisible = true
+      this.orderNo = orderNo
+    },
+    // 关闭退款对话框
+    closeDialog() {
+      console.log('close.................')
+      this.refundDialogVisible = false
+      // 还原组件状态
+      this.orderNo = ''
+      this.reason = ''
+      this.refundSubmitBtnDisabled = false
+    },
+    // 确认退款
+    async toRefunds() {
+      this.refundSubmitBtnDisabled = true // 禁用按钮，防止重复提交
+      await refunds(this.orderNo, this.reason).then(result => {
+        console.log('result', result)
+        if (result && result.code === 0) {
+          this.closeDialog()
+          this.getList()
+          this.$message.success('退款操作成功，退款中...')
+        } else {
+          this.$message.warning('保存失败')
+        }
+      })
+    },
+    async checkRefunds() {
+      window.intervalObject()
+      setTimeout(() => {
+        var that = this
+        var pageNum = that.listQuery.page
+        var pageSize = that.listQuery.limit
+        findLogPage({ 'pageNum': pageNum, 'pageSize': pageSize }).then((result) => {
+          if (result && result.code === 0) {
+            console.log(JSON.parse(JSON.stringify(result)))
+            that.list = result.data.content
+            // that.listQuery.page = result.data.
+            // that.listQuery.limit = result.data.
+            that.total = result.data.totalSize
+          } else {
+            that.$message.warning('保存失败')
+          }
+        })
+      }, 1.5 * 100)
+    },
+    selectType(param) {
+      var state = null
+      switch (param) {
+        case '支付成功':
+          state = 'success'
+          break
+        case '超时已关闭':
+          state = 'warning'
+          break
+        case '用户已取消':
+          state = 'info'
+          break
+        case '退款中':
+          state = 'danger'
+          break
+        case '已退款':
+          state = 'info'
+          break
+        case '未支付':
+          state = 'danger'
+      }
+      return state
+    },
+    async getList() {
+      var that = this
+      // that.listLoading = true
+      console.log('searchParam=', that.listQuery.title)
+      var pageNum = that.listQuery.page
+      var pageSize = that.listQuery.limit
+      await findLogPage({ 'pageNum': pageNum, 'pageSize': pageSize, 'searchParam': that.listQuery.title ? that.listQuery.title : '' }).then((result) => {
+        if (result && result.code === 0) {
+          console.log(JSON.parse(JSON.stringify(result)))
+          that.list = result.data.content
+          // that.listQuery.page = result.data.
+          // that.listQuery.limit = result.data.
+          that.total = result.data.totalSize
+        } else {
+          that.$message.warning('保存失败')
+        }
+      })
+      // that.list = [{ 'id': 1, 'timestamp': 803380321626, 'author': 'Elizabeth', 'reviewer': 'Charles', 'title': 'Phto Umfhyvn Bbpctd Gppelbjobs Huha Cod Qcewjhx', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 49.69, 'importance': 2, 'type': 'JP', 'status': 'draft', 'display_time': '1971-09-25 22:21:09', 'comment_disabled': true, 'pageviews': 4435, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 2, 'timestamp': 203661565471, 'author': 'Jeffrey', 'reviewer': 'Joseph', 'title': 'Liutpj Srzxsyo Qbvto Jrek Ktph Lvxggjitej', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 23.07, 'importance': 2, 'type': 'US', 'status': 'published', 'display_time': '1980-10-01 05:34:34', 'comment_disabled': true, 'pageviews': 4231, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 3, 'timestamp': 1575937832164, 'author': 'Kevin', 'reviewer': 'James', 'title': 'Kesnq Fwmtlufih Qpie Twfm Bkkbzkx Qkct Ljjanvm', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 83.28, 'importance': 2, 'type': 'US', 'status': 'draft', 'display_time': '2019-10-25 20:18:19', 'comment_disabled': true, 'pageviews': 4492, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 4, 'timestamp': 893621388286, 'author': 'Thomas', 'reviewer': 'Brian', 'title': 'Djfbcnvht Twpvmd Qjbw Tvrq Xftjujkf Pomrxapk Mobs Dplr Tfijiamu', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 71.13, 'importance': 2, 'type': 'JP', 'status': 'published', 'display_time': '1974-03-05 12:45:40', 'comment_disabled': true, 'pageviews': 1997, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 5, 'timestamp': 417094195427, 'author': 'Jessica', 'reviewer': 'Ruth', 'title': 'Bxtit Vumcdmvork Dorkn Smunohkhki Qkvqwlk Ptyhgk Krrjend Tlrezmd Byfmeau Qqdfjp', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 54.75, 'importance': 2, 'type': 'US', 'status': 'draft', 'display_time': '1979-11-30 02:01:46', 'comment_disabled': true, 'pageviews': 4501, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 6, 'timestamp': 1301855019498, 'author': 'Jeffrey', 'reviewer': 'Karen', 'title': 'Iksk Fjgpdxwb Fhlw Wdzht Xxyixe Qknrqwtdsv Dqllmsggu Uuauosnld Kwqs Cdld', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 5.47, 'importance': 1, 'type': 'US', 'status': 'draft', 'display_time': '1994-04-13 05:13:29', 'comment_disabled': true, 'pageviews': 2336, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 7, 'timestamp': 1375880283337, 'author': 'Steven', 'reviewer': 'Larry', 'title': 'Uuqjfylfwh Rsfgw Rxwxla Pmom Igrkgu', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 0.95, 'importance': 2, 'type': 'JP', 'status': 'draft', 'display_time': '1984-12-30 12:27:26', 'comment_disabled': true, 'pageviews': 4354, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 8, 'timestamp': 836327661361, 'author': 'Gary', 'reviewer': 'Daniel', 'title': 'Qplyhouldr Riwike Hcidbmh Jqghzh Fttc Gffgifgdu Dtffwylfw Lhngvk', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 74.43, 'importance': 2, 'type': 'CN', 'status': 'draft', 'display_time': '1970-10-10 15:01:51', 'comment_disabled': true, 'pageviews': 540, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 9, 'timestamp': 1249461168915, 'author': 'Carol', 'reviewer': 'Sarah', 'title': 'Yxuorxy Ulfi Pywcfbtlg Mujjwuh Jeoitnx', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 66.71, 'importance': 3, 'type': 'US', 'status': 'draft', 'display_time': '1999-08-01 14:59:51', 'comment_disabled': true, 'pageviews': 2206, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 10, 'timestamp': 991010925276, 'author': 'Edward', 'reviewer': 'Lisa', 'title': 'Kxyj Hloyfd Djcq Kxqmdmfdsb Ucixtcx Jngclip', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 72.43, 'importance': 2, 'type': 'CN', 'status': 'draft', 'display_time': '2002-09-07 14:57:22', 'comment_disabled': true, 'pageviews': 4718, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 11, 'timestamp': 1002220180868, 'author': 'Nancy', 'reviewer': 'Sandra', 'title': 'Wgswkyc Lmmtzbeu Jxhs Xvno Ovtnm Otfpumcf Jfqbenvap', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 6.62, 'importance': 2, 'type': 'JP', 'status': 'draft', 'display_time': '2018-11-16 10:29:07', 'comment_disabled': true, 'pageviews': 1985, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 12, 'timestamp': 47657650328, 'author': 'Mary', 'reviewer': 'Matthew', 'title': 'Tagjo Veimsieot Pueippd Zkjnqq Tzbv Ttnx', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 88.88, 'importance': 2, 'type': 'JP', 'status': 'published', 'display_time': '1979-11-18 03:50:42', 'comment_disabled': true, 'pageviews': 738, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 13, 'timestamp': 436962300263, 'author': 'Brenda', 'reviewer': 'Thomas', 'title': 'Nsdio Ezxcml Ybslm Ufwk Eflmiaozy Edfsugk', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 33.72, 'importance': 2, 'type': 'JP', 'status': 'draft', 'display_time': '1973-09-30 10:38:33', 'comment_disabled': true, 'pageviews': 1552, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 14, 'timestamp': 1211302507717, 'author': 'Dorothy', 'reviewer': 'Jason', 'title': 'Eopryw Yswjcvoub Hoqsh Xdvp Vjsvgtuy Pnpp Jpqoqcs', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 44.42, 'importance': 3, 'type': 'JP', 'status': 'draft', 'display_time': '2001-06-08 08:50:07', 'comment_disabled': true, 'pageviews': 2039, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 15, 'timestamp': 57519122580, 'author': 'Eric', 'reviewer': 'Jeffrey', 'title': 'Jsjneeg Rfcywbt Ennh Cpdvrq Csdnhmxbr Kuwk Rdoghbihs Irccm', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 22.44, 'importance': 2, 'type': 'EU', 'status': 'published', 'display_time': '1990-08-28 20:08:46', 'comment_disabled': true, 'pageviews': 4250, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 16, 'timestamp': 1331305306184, 'author': 'Kimberly', 'reviewer': 'Gary', 'title': 'Cfuqrg Pcdl Epmdpxlodo Jwhjgep Szqnim Ohwltyy Tsrxkuvfy Wbbvk Mcxsyrxd', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 26.03, 'importance': 3, 'type': 'US', 'status': 'published', 'display_time': '2020-10-12 21:44:35', 'comment_disabled': true, 'pageviews': 915, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 17, 'timestamp': 737661074299, 'author': 'Anthony', 'reviewer': 'Scott', 'title': 'Imn Dvmnidlvp Lpylchwui Vtzzbtex Pybogro Ooxhfsozk', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 53.16, 'importance': 2, 'type': 'US', 'status': 'draft', 'display_time': '2011-03-15 10:36:47', 'comment_disabled': true, 'pageviews': 4298, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 18, 'timestamp': 111502496706, 'author': 'Jessica', 'reviewer': 'Christopher', 'title': 'Krroywn Syudufqw Gczhbjr Gcrm Wsbr Qxqvnp Dzgi Ekbfls Ycefwpceid Garqgum', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 61.13, 'importance': 3, 'type': 'US', 'status': 'draft', 'display_time': '1970-01-07 21:19:02', 'comment_disabled': true, 'pageviews': 2385, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 19, 'timestamp': 233294636091, 'author': 'Maria', 'reviewer': 'Richard', 'title': 'Ktxhz Kguzcvvfl Zaofe Cyhxxxdb Ddyetbya Pjxd', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 9.55, 'importance': 2, 'type': 'US', 'status': 'published', 'display_time': '1999-05-01 00:13:30', 'comment_disabled': true, 'pageviews': 3531, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }, { 'id': 20, 'timestamp': 1518814286075, 'author': 'Carol', 'reviewer': 'Elizabeth', 'title': 'Cgbstrg Sjzchlkd Qqnokrui Scqpp Nmqrqfucow Rhusz Cdeoriql', 'content_short': 'mock data', 'content': '<p>I am testing data, I am testing data.</p><p><img src="https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943"></p>', 'forecast': 26.67, 'importance': 2, 'type': 'EU', 'status': 'published', 'display_time': '1980-11-22 20:56:47', 'comment_disabled': true, 'pageviews': 2665, 'image_uri': 'https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3', 'platforms': ['a-platform'] }]
+      // that.total = 100
 
       // Just to simulate the time of the request
       setTimeout(() => {
-        this.listLoading = false
-      }, 1.5 * 1000)
+        that.listLoading = false
+      }, 1.5 * 100)
       // fetchList(this.listQuery).then(response => {
       // })
     },
     handleFilter() {
+      // 播放提示音
+      // var audio = new Audio('/new_order.mp3')
+      // audio.play()
+      this.timed = null
+      this.listLoading = true
       this.listQuery.page = 1
       this.getList()
     },
-    handleModifyStatus(row, status) {
-      this.$message({
-        message: '操作Success',
-        type: 'success'
-      })
-      row.status = status
-    },
+    // handleModifyStatus(row, status, index) {
+    //   this.$message({
+    //     message: '操作Success',
+    //     type: 'success'
+    //   })
+    //   row.status = status
+    // },
     sortChange(data) {
       const { prop, order } = data
       if (prop === 'id') {
@@ -344,15 +546,15 @@ export default {
         }
       })
     },
-    handleDelete(row, index) {
-      this.$notify({
-        title: 'Success',
-        message: 'Delete Successfully',
-        type: 'success',
-        duration: 2000
-      })
-      this.list.splice(index, 1)
-    },
+    // handleDelete(row, index) {
+    //   this.$notify({
+    //     title: 'Success',
+    //     message: 'Delete Successfully',
+    //     type: 'success',
+    //     duration: 2000
+    //   })
+    //   this.list.splice(index, 1)
+    // },
     handleFetchPv(pv) {
       fetchPv(pv).then(response => {
         this.pvData = response.data.pvData

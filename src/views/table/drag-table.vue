@@ -8,7 +8,7 @@
         <div
           class="filter-container"
         >
-          <el-input v-model="listQuery.title" placeholder="用户信息111" style="width: 200px;" class="filter-item" size="mini" @keyup.enter.native="handleFilter" />
+          <el-input v-model="listQuery.title" placeholder="请输入联系方式.." style="width: 200px;" class="filter-item" size="mini" @keyup.enter.native="handleFilter()" />
           <!-- <el-select v-model="listQuery.importance" placeholder="Imp" clearable style="width: 90px" class="filter-item">
             <el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item" />
           </el-select>
@@ -18,7 +18,7 @@
           <el-select v-model="listQuery.sort" style="width: 140px" class="filter-item" @change="handleFilter">
             <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" />
           </el-select> -->
-          <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" size="mini" @click="handleFilter">
+          <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" size="mini" @click="handleFilter()">
             Search
           </el-button>
           <!-- <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
@@ -41,7 +41,7 @@
           fit
           highlight-current-row
           style="width: 100%;"
-          height="644px"
+          height="calc(100vh - 220px)"
           @sort-change="sortChange"
         >
           <el-table-column
@@ -123,6 +123,11 @@
           <el-table-column label="服务时间" width="110px" align="center">
             <template slot-scope="{row}">
               <span>{{ row.servicetime }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="联系方式" width="195px" align="center">
+            <template slot-scope="{row}">
+              <span>{{ row.phone }}</span>
             </template>
           </el-table-column>
           <el-table-column label="地址" prop="id" align="center" width="270">
@@ -375,13 +380,29 @@ export default {
         timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
         title: [{ required: true, message: 'title is required', trigger: 'blur' }]
       },
-      downloadLoading: false
+      downloadLoading: false,
+      new_order_count: 0
     }
   },
   created() {
     this.getList()
+    this.setTiming()
+  },
+  destroyed() {
+    window.clearInterval(this.timed)// 销毁定时任务
   },
   methods: {
+    // 设置定时获取列表
+    setTiming() {
+      this.timed = window.setInterval(() => {
+        setTimeout(() => {
+          // if(){
+
+          // }
+          // this.getList()
+        }, 0)
+      }, 3000)// 3s获取一次
+    },
     // 用户取消订单
     async cancelOrder(orderNo) {
       await cancel(orderNo).then(response => {
@@ -407,11 +428,35 @@ export default {
     // 确认退款
     async toRefunds() {
       this.refundSubmitBtnDisabled = true // 禁用按钮，防止重复提交
-      await refunds(this.orderNo, this.reason).then(response => {
-        console.log('response', response)
-        this.closeDialog()
-        this.showOrderList()
+      await refunds(this.orderNo, this.reason).then(result => {
+        console.log('result', result)
+        if (result && result.code === 0) {
+          this.closeDialog()
+          this.getList()
+          this.$message.success('退款操作成功，退款中...')
+        } else {
+          this.$message.warning('保存失败')
+        }
       })
+    },
+    async checkRefunds() {
+      window.intervalObject()
+      setTimeout(() => {
+        var that = this
+        var pageNum = that.listQuery.page
+        var pageSize = that.listQuery.limit
+        findPage({ 'pageNum': pageNum, 'pageSize': pageSize }).then((result) => {
+          if (result && result.code === 0) {
+            console.log(JSON.parse(JSON.stringify(result)))
+            that.list = result.data.content
+            // that.listQuery.page = result.data.
+            // that.listQuery.limit = result.data.
+            that.total = result.data.totalSize
+          } else {
+            that.$message.warning('保存失败')
+          }
+        })
+      }, 1.5 * 100)
     },
     selectType(param) {
       var state = null
@@ -438,10 +483,11 @@ export default {
     },
     async getList() {
       var that = this
-      that.listLoading = true
+      // that.listLoading = true
+      console.log('searchParam=', that.listQuery.title)
       var pageNum = that.listQuery.page
       var pageSize = that.listQuery.limit
-      await findPage({ 'pageNum': pageNum, 'pageSize': pageSize }).then((result) => {
+      await findPage({ 'pageNum': pageNum, 'pageSize': pageSize, 'searchParam': that.listQuery.title ? that.listQuery.title : '' }).then((result) => {
         if (result && result.code === 0) {
           console.log(JSON.parse(JSON.stringify(result)))
           that.list = result.data.content
@@ -463,6 +509,11 @@ export default {
       // })
     },
     handleFilter() {
+      // 播放提示音
+      // var audio = new Audio('/new_order.mp3')
+      // audio.play()
+      this.timed = null
+      this.listLoading = true
       this.listQuery.page = 1
       this.getList()
     },

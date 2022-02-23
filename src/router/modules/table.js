@@ -36,7 +36,7 @@ const tableRouter = {
       path: 'complexTable',
       component: () => import('@/views/table/complexTable'),
       name: 'ComplexTable',
-      meta: { title: '访问列表' }
+      meta: { title: '日志记录' }
     }
   ]
 }

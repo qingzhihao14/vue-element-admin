@@ -1,5 +1,6 @@
 import request from '@/utils/request'
 
+var path = '/home'
 // export function insertOrUpdateLbItems(data, filesCsLd) {
 //   if (data.B107) {
 //     data.B107 = data.B107.toString()
@@ -20,7 +21,7 @@ import request from '@/utils/request'
 // }
 export function login(data) {
   return request({
-    url: '/adminlogin',
+    url: path + '/adminlogin',
     method: 'post',
     data
   })
@@ -28,7 +29,7 @@ export function login(data) {
 
 export function getInfo(token) {
   return request({
-    url: '/admininfo',
+    url: path + '/admininfo',
     method: 'post',
     params: { token }
   })
@@ -36,32 +37,32 @@ export function getInfo(token) {
 
 export function logout() {
   return request({
-    url: '/vue-element-admin/user/logout',
+    url: path + '/vue-element-admin/user/logout',
     method: 'post'
   })
 }
 export function getLb() {
   return request({
-    url: '/getLb',
+    url: path + '/getLb',
     method: 'get'
   })
 }
 export function getLbXms() {
   return request({
-    url: '/getLbXms',
+    url: path + '/getLbXms',
     method: 'get'
   })
 }
 export function delLb(params) {
   return request({
-    url: '/delLb',
+    url: path + '/delLb',
     method: 'get',
     params: params
   })
 }
 export function delXm(params) {
   return request({
-    url: '/delXm',
+    url: path + '/delXm',
     method: 'get',
     params: params
   })
@@ -72,7 +73,7 @@ export function insertOrUpdateLbItemPic(id, filesCsLd) {
   param.append('id', id)
   return request({
     headers: { 'Content-Type': 'multipart/form-data' },
-    url: '/insertOrUpdateLbItemPic',
+    url: path + '/insertOrUpdateLbItemPic',
     method: 'post',
     data: param
   })
@@ -84,7 +85,7 @@ export function insertOrUpdateLbPic(id, filesCsLd) {
   param.append('id', id)
   return request({
     headers: { 'Content-Type': 'multipart/form-data' },
-    url: '/insertOrUpdateLbPic',
+    url: path + '/insertOrUpdateLbPic',
     method: 'post',
     data: param
   })
@@ -101,7 +102,7 @@ export function insertOrUpdateLbs(formData) {
   param.append('picPath', formData.picPath)
   return request({
     headers: { 'Content-Type': 'multipart/form-data' },
-    url: '/insertOrUpdateLbs',
+    url: path + '/insertOrUpdateLbs',
     method: 'post',
     data: param
   })
@@ -126,28 +127,35 @@ export function insertOrUpdateLbItem(formData) {
   param.append('picPath', formData.picPath)
   return request({
     headers: { 'Content-Type': 'multipart/form-data' },
-    url: '/insertOrUpdateLbItem',
+    url: path + '/insertOrUpdateLbItem',
     method: 'post',
     data: param
   })
 }
 export function insertOrUpdateLb(data) {
   return request({
-    url: '/insertOrUpdateLb',
+    url: path + '/insertOrUpdateLb',
     method: 'post',
     data
   })
 }
 export function changeIsChoice(params) {
   return request({
-    url: '/changeIsChoice',
+    url: path + '/changeIsChoice',
     method: 'get',
     params
   })
 }
 export function findPage(data) {
   return request({
-    url: '/findPage',
+    url: path + '/findPage',
+    method: 'post',
+    data
+  })
+}
+export function findLogPage(data) {
+  return request({
+    url: path + '/findLogPage',
     method: 'post',
     data
   })
@@ -159,9 +167,16 @@ export function cancel(data) {
     data
   })
 }
-export function refunds(data) {
+export function refunds(orderNo, reason) {
   return request({
-    url: '/api/wx-pay/refunds/',
+    url: '/api/wx-pay/refunds/' + orderNo + '/' + reason,
+    method: 'post'
+  })
+}
+//
+export function taskFindOrders(data) {
+  return request({
+    url: path + '/taskFindOrders',
     method: 'post',
     data
   })
