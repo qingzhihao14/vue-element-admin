@@ -4,7 +4,7 @@
     <el-form ref="loginForm" :model="loginForm" class="login-form" autocomplete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 class="title">家政管理平台</h3>
       </div>
 
       <el-form-item prop="username">
@@ -14,7 +14,7 @@
         <el-input
           ref="username"
           v-model="loginForm.username"
-          placeholder="Username"
+          placeholder="账号"
           name="username"
           type="text"
           tabindex="1"
@@ -32,7 +32,7 @@
             ref="password"
             v-model="loginForm.password"
             :type="passwordType"
-            placeholder="Password"
+            placeholder="密码"
             name="password"
             tabindex="2"
             autocomplete="on"
@@ -46,9 +46,9 @@
         </el-form-item>
       </el-tooltip>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
 
-      <div style="position:relative">
+      <!-- <div style="position:relative">
         <div class="tips">
           <span>Username : admin</span>
           <span>Password : any</span>
@@ -61,7 +61,7 @@
         <el-button class="thirdparty-button" type="primary" @click="showDialog=true">
           Or connect with
         </el-button>
-      </div>
+      </div> -->
     </el-form>
 
     <el-dialog title="Or connect with" :visible.sync="showDialog">
@@ -99,7 +99,7 @@ export default {
     return {
       loginForm: {
         username: 'admin',
-        password: 'admin'
+        password: ''
       },
       // loginRules: {
       //   username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -154,22 +154,24 @@ export default {
       })
     },
     handleLogin() {
-      this.$refs.loginForm.validate(valid => {
+      var that = this
+      that.$refs.loginForm.validate(valid => {
         if (valid) {
-          this.loading = true
-          this.$store.dispatch('user/login', this.loginForm)
+          that.loading = true
+          that.$store.dispatch('user/login', that.loginForm)
             .then((param) => {
               if (param.code === 0) {
-                this.$message.success('登陆成功！')
-                this.$router.push({ path: '/dashboard', query: this.otherQuery })
-                this.loading = false
+                that.$message.success('登陆成功！')
+                that.$router.push({ path: '/dashboard', query: that.otherQuery })
+                // that.$store.commit('handleUserName', that.loginForm.username)
+                that.loading = false
               } else {
-                this.$message.info(param.message)
-                this.loading = false
+                that.$message.info(param.message)
+                that.loading = false
               }
             })
             .catch(() => {
-              this.loading = false
+              that.loading = false
             })
         } else {
           console.log('error submit!!')

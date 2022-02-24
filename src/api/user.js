@@ -181,3 +181,10 @@ export function taskFindOrders(data) {
     data
   })
 }
+export function insertOrUpdateAdmin(data) {
+  return request({
+    url: path + '/insertOrUpdateAdmin',
+    method: 'post',
+    data
+  })
+}

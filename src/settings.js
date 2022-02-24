@@ -1,9 +1,9 @@
 module.exports = {
   //
-  baseURL: 'http://localhost:8521',
-  // baseURL: 'http://static.asia:70',
+  // baseURL: 'http://localhost:8521',
+  baseURL: 'http://static.asia:70',
 
-  title: 'Vue Element Admin',
+  title: '家政管理平台',
 
   /**
    * @type {boolean} true | false
