@@ -65,12 +65,12 @@
           <!-- <el-table-column label="用户" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')"> -->
           <el-table-column label="用户" prop="id" align="center">
             <template slot-scope="{row}">
-              <span>{{ row.username }}</span>
+              <span>{{ row.name }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="收货用户" prop="id" align="center">
+          <el-table-column label="性别" prop="id" align="center">
             <template slot-scope="{row}">
-              <span>{{ row.name }}</span>
+              <span>{{ row.sex===0?"男":"女" }}</span>
             </template>
           </el-table-column>
           <!-- <el-table-column label="用户" prop="id" align="center" width="120">
@@ -80,14 +80,14 @@
           </el-table-column> -->
           <el-table-column label="联系方式" align="center">
             <template slot-scope="{row}">
-              <span>{{ row.phone?row.phone:'无' }}</span>
+              <span>{{ row.code?row.code:'无' }}</span>
             </template>
           </el-table-column>
           <el-table-column label="头像" align="center">
             <template slot-scope="{row}">
               <!-- <span>{{ row.avatar?row.avatar:'无' }}</span> -->
               <picture>
-                <img :src="row.avatar" style="width:auto;">
+                <img :src="row.note" style="width:auto;">
               </picture>
             </template>
           </el-table-column>
@@ -232,7 +232,7 @@ import { fetchPv, createArticle, updateArticle } from '@/api/article'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-import { findPage, cancel, refunds } from '@/api/user'
+import { findUsersPage, cancel, refunds } from '@/api/user'
 const calendarTypeOptions = [
   { key: 'CN', display_name: 'China' },
   { key: 'US', display_name: 'USA' },
@@ -386,7 +386,7 @@ export default {
         var that = this
         var pageNum = that.listQuery.page
         var pageSize = that.listQuery.limit
-        findPage({ 'pageNum': pageNum, 'pageSize': pageSize }).then((result) => {
+        findUsersPage({ 'pageNum': pageNum, 'pageSize': pageSize }).then((result) => {
           if (result && result.code === 0) {
             console.log(JSON.parse(JSON.stringify(result)))
             that.list = result.data.content
@@ -428,7 +428,7 @@ export default {
       console.log('searchParam=', that.listQuery.title)
       var pageNum = that.listQuery.page
       var pageSize = that.listQuery.limit
-      await findPage({ 'pageNum': pageNum, 'pageSize': pageSize, 'searchParam': that.listQuery.title ? that.listQuery.title : '' }).then((result) => {
+      await findUsersPage({ 'pageNum': pageNum, 'pageSize': pageSize, 'searchParam': that.listQuery.title ? that.listQuery.title : '' }).then((result) => {
         if (result && result.code === 0) {
           console.log(JSON.parse(JSON.stringify(result)))
           that.list = result.data.content

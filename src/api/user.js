@@ -153,6 +153,13 @@ export function findPage(data) {
     data
   })
 }
+export function findUsersPage(data) {
+  return request({
+    url: path + '/findUsersPage',
+    method: 'post',
+    data
+  })
+}
 export function findLogPage(data) {
   return request({
     url: path + '/findLogPage',
@@ -162,9 +169,8 @@ export function findLogPage(data) {
 }
 export function cancel(data) {
   return request({
-    url: '/api/wx-pay/cancel/',
-    method: 'post',
-    data
+    url: '/api/wx-pay/cancel/' + data,
+    method: 'post'
   })
 }
 export function refunds(orderNo, reason) {

@@ -64,7 +64,7 @@
             </template>
           </el-table-column>
           <!-- <el-table-column label="用户" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')"> -->
-          <el-table-column fixed label="用户" prop="id" align="center" width="120">
+          <el-table-column fixed label="微信用户" prop="id" align="center" width="120">
             <template slot-scope="{row}">
               <span>{{ row.username }}</span>
             </template>
@@ -386,6 +386,7 @@ export default {
   },
   created() {
     this.getList()
+
     this.setTiming()
   },
   destroyed() {
@@ -399,8 +400,8 @@ export default {
           // if(){
 
           // }
-          // this.getList()
-        }, 0)
+          this.getList()
+        }, 2)
       }, 3000)// 3s获取一次
     },
     // 用户取消订单
@@ -415,6 +416,7 @@ export default {
     refundOrder(orderNo) {
       this.refundDialogVisible = true
       this.orderNo = orderNo
+      this.setTiming()
     },
     // 关闭退款对话框
     closeDialog() {
