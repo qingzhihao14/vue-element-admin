@@ -194,3 +194,11 @@ export function insertOrUpdateAdmin(data) {
     data
   })
 }
+
+export function getStores(data) {
+  return request({
+    url: path + '/getStores',
+    method: 'post',
+    data
+  })
+}

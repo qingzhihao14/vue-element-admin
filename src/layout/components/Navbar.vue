@@ -12,6 +12,18 @@
           autoplay="autoplay"
           controls="controls"
         >Your browser does not support the audio element.</audio> -->
+        <template>
+          <div class="right-menu-item" style="font-size: 15px"> 门店:{{ value }}
+          </div>
+          <!-- <el-select v-model="value" class="right-menu-item" placeholder="请选择门店" size="mini">
+            <el-option
+              v-for="item in options"
+              :key="item.code"
+              :label="item.name"
+              :value="item.code"
+            />
+          </el-select> -->
+        </template>
         <el-badge :value="myvalue" class="right-menu-item" :type="myvalue>0?'danger':'primary'">
           <router-link to="/table/drag-table">
             <a style="font-size: 15px;text-decoration: underline;">新订单</a>
@@ -58,7 +70,7 @@ import ErrorLog from '@/components/ErrorLog'
 import Screenfull from '@/components/Screenfull'
 import SizeSelect from '@/components/SizeSelect'
 import Search from '@/components/HeaderSearch'
-import { taskFindOrders } from '@/api/user'
+import { taskFindOrders, getStores } from '@/api/user'
 export default {
   components: {
     Breadcrumb,
@@ -70,7 +82,11 @@ export default {
   },
   data() {
     return {
-      myvalue: 0
+      myvalue: 0,
+
+      options: [],
+      value: '',
+      mdcode: ''
     }
   },
   computed: {
@@ -84,9 +100,26 @@ export default {
     this.setTiming()
   },
   mounted() {
+    console.log('this.$store.getters.mdcode===' + this.$store.getters.mdcode)
+    this.mdcode = this.$store.getters.mdcode
     // this.play()
+    this.getStores()
   },
   methods: {
+
+    async getStores() {
+      var that = this
+      // that.listLoading = true
+      await getStores({ 'way': 'all', 'code': that.mdcode }).then((result) => {
+        console.log('result', result)
+        if (result && result.code === 0) {
+          that.value = result.data[0].name
+          that.options = result.data
+        } else {
+          this.$message.warning('查询失败')
+        }
+      })
+    },
     // 设置定时获取列表
     setTiming() {
       var that = this

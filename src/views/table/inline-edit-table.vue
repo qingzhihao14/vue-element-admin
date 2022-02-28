@@ -68,11 +68,11 @@
               <span>{{ row.name }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="性别" prop="id" align="center">
+          <!-- <el-table-column label="性别" prop="id" align="center">
             <template slot-scope="{row}">
               <span>{{ row.sex===0?"男":"女" }}</span>
             </template>
-          </el-table-column>
+          </el-table-column> -->
           <!-- <el-table-column label="用户" prop="id" align="center" width="120">
             <template slot-scope="{row}">
               <span>{{ row.userId }}</span>

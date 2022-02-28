@@ -72,11 +72,11 @@
               <span>{{ row.username?row.name: row.username }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="性别" width="135px" align="center">
+          <!-- <el-table-column label="性别" width="135px" align="center">
             <template slot-scope="{row}">
               <span>{{ row.sex==='1'?'男':'女' }}</span>
             </template>
-          </el-table-column>
+          </el-table-column> -->
           <el-table-column label="头像" align="center">
             <template slot-scope="{row}">
               <!-- <span>{{ row.avatar?row.avatar:'无' }}</span> -->
